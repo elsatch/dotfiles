@@ -1,0 +1,62 @@
+# use the fix for pbpaste/pbcopy, see: https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
+set-option -g default-command "reattach-to-user-namespace -l zsh"
+# using `C-a, y`, this puts the copied tmux buffer in the osx clipboard
+bind y run-shell "reattach-to-user-namespace -l zsh -c 'tmux showb | pbcopy'"
+
+set -g default-terminal "screen-256color"
+
+# start tab numbering at 1, not 0
+set -g base-index 1
+
+# Sane scrolling
+# Note: the more I think about this, the less I want to use it. Left for historical reasons
+# set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+
+#set option globally to use Control-a as command prefix key
+set-option -g prefix C-a
+bind a send-prefix
+
+# Highlight active window
+set-window-option -g window-status-current-bg red
+
+set -g status-right '#[fg=yellow]#(uptime | cut -d “,” -f 2-)'
+
+bind-key C-a last-window
+
+unbind % # Remove default binding since we're replacing
+bind | split-window -h
+bind - split-window -v
+
+# Set status bar
+set -g status-bg black
+set -g status-fg white
+set -g status-left '#[fg=green]#H'
+
+# Set window notifications
+setw -g monitor-activity on
+set -g visual-activity on
+
+# use the vim motion keys to move between panes
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# use vim motion keys while in copy mode
+setw -g mode-keys vi
+
+# Automatically set window title
+setw -g automatic-rename
+
+# Faster Escape Sequence Time
+set -s escape-time 0
+
+# Aggresive Resize
+setw -g aggressive-resize on
+
+# r = tmux renumbering script, courtesy of: http://brainscraps.wikia.com/wiki/Renumbering_tmux_Windows
+unbind r
+bind r run-shell "reattach-to-user-namespace -l zsh -c '~/bin/tmux_renum'"
+# bind r run "~/bin/tmux_renum"
+
+#TODO: read comments here: http://robots.thoughtbot.com/post/19398560514/how-to-copy-and-paste-with-tmux-on-mac-os-x
