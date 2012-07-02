@@ -4,6 +4,8 @@ else
   export PS1='%3~$(git_info_for_prompt)$(hg_info_for_prompt)%# '
 fi
 
+bindkey -v
+
 export EDITOR='vim'
 export LSCOLORS="exfxcxdxbxegedabagacad"
 export CLICOLOR=true
@@ -35,7 +37,7 @@ setopt INC_APPEND_HISTORY SHARE_HISTORY  # adds history incrementally and share 
 setopt HIST_REDUCE_BLANKS
 setopt HIST_IGNORE_SPACE
 
-zle -N newtab
+# zle -N newtab # not sure what this does
 
 bindkey '^[^[[D' backward-word
 bindkey '^[^[[C' forward-word
@@ -44,3 +46,5 @@ bindkey '^[[5C' end-of-line
 bindkey '^[[3~' delete-char
 bindkey '^[^N' newtab
 bindkey '^?' backward-delete-char
+
+bindkey -M vicmd v edit-command-line
