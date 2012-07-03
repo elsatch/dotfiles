@@ -1,0 +1,4 @@
+#!/bin/bash
+
+curl "http://sfoc.us/yourls-api.php?signature=$YOURLSKEY&action=shorturl&format=simple&url=$1"
+echo ""
