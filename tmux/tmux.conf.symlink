@@ -1,7 +1,7 @@
 # use the fix for pbpaste/pbcopy, see: https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
-set-option -g default-command "reattach-to-user-namespace -l zsh"
+# set-option -g default-command "reattach-to-user-namespace -l zsh"
 # using `C-a, y`, this puts the copied tmux buffer in the osx clipboard
-bind y run-shell "reattach-to-user-namespace -l zsh -c 'tmux showb | pbcopy'"
+# bind y run-shell "reattach-to-user-namespace -l zsh -c 'tmux showb | pbcopy'"
 
 set -g default-terminal "screen-256color"
 
