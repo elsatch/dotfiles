@@ -1,139 +1,468 @@
-" ----------------------------------------------------------------------------
-"  General Kung Fu
-" ----------------------------------------------------------------------------
-
-" Use Vim settings, rather then Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
 set nocompatible
 
-" Use pathogen to easily modify the runtime path to include all
-" plugins under the ~/.vim/bundle directory
+" Prevent arbitrary command execution vulnerability 
+" http://www.securityfocus.com/bid/14374/references
+set modelines=0
+
+let mapleader = ","
+
+" Enable plugin bundle management
+filetype off
+" call pathogen#runtime_append_all_bundles()
+" call pathogen#helptags()
 call pathogen#infect()
-syntax on
+
+" Enable filetype plugin
 filetype plugin indent on
 
-" Swapfiles mostly just get in the way for me.
-set noswapfile
+" Set to autoread when file is changed outside of Vim
+set autoread
 
-" ----------------------------------------------------------------------------
-"  Text Formatting
-" ----------------------------------------------------------------------------
+" don't use Ex mode, use Q for formatting
+map Q gq
 
-set autoindent             " automatic indent new lines
-set smartindent            " be smart about it
-inoremap # X<BS>#
-set softtabstop=2          " yep, two
-set shiftwidth=2           " ..
-set tabstop=4
-set expandtab              " expand tabs to spaces
-set nosmarttab             " fuck tabs
-set formatoptions+=qrn1    " support for numbered/bullet lists
-"set textwidth=80           " wrap at 80 chars by default
-set virtualedit=block      " allow virtual edit in visual block ..
-set list listchars=tab:»»,trail:·
+" use ',,' to swap between two most recent buffers
+nnoremap <leader><leader> <c-^>
 
-" ----------------------------------------------------------------------------
-"  Remapping
-" ----------------------------------------------------------------------------
-
-" lead with ,
-" let mapleader = ","
-
-" exit to normal mode with 'jj'
+" Remaps a double-j press to return to normal mode
 inoremap jj <ESC>
+inoremap kk <ESC>
 
+" Visually select the text that was last edited/pasted
+noremap gV `[v`]
 
-" reflow paragraph with Q in normal and visual mode
-nnoremap Q gqap
-vnoremap Q gq
+" Bubbling feature below required Tim Pope's vim-unimpaired
+" Bubble single lines
+nmap <C-Up> [e
+nmap <C-Down> ]e
 
-" sane movement with wrap turned on
+" Bubble multiple lines
+vmap <C-Up> [egv
+vmap <C-Down> ]egv
+
+" Better movement with wrapped lines
 nnoremap j gj
 nnoremap k gk
-vnoremap j gj
-vnoremap k gk
-nnoremap <Down> gj
-nnoremap <Up> gk
-vnoremap <Down> gj
-vnoremap <Up> gk
-inoremap <Down> <C-o>gj
-inoremap <Up> <C-o>gk
 
-" give my pinky a bit of a break
-noremap ; :
-noremap , ;
+" Reselect visual block after indent/outdent
+vnoremap < <gv
+vnoremap > >gv
 
-" ----------------------------------------------------------------------------
-"  UI
-" ----------------------------------------------------------------------------
+" Yank to end of line without line break
+nnoremap Y yg_
 
-set ruler                  " show the cursor position all the time
-set noshowcmd              " don't display incomplete commands
-set nolazyredraw           " turn off lazy redraw
-set number                 " line numbers
+" Yank whole line without line break
+nnoremap YY 0yg_
+
+" Remaps control-backspace to delete entire word in insert mode
+inoremap <C-BS> <Esc>dbxa
+
+" Fast saving with "<leader>s"
+nmap <leader>s :w!<cr>
+
+nnoremap <tab> %
+vnoremap <tab> %
+
+" http://vimcasts.org/e/14
+" expand the directory of the current file 
+" cnoremap %% <C-R>=expand('%:h').'/'<cr>
+
+" Wrap toggling with <leader>w
+command! -nargs=* Wrap set wrap linebreak nolist
+nnoremap <leader>w :set nowrap! nolinebreak! nolist<cr>
+
+" Fast editing of the Vim configuration file
+map <F3> :e ~/.vimrc<cr>
+
+" When Vim configuration file is edited, reload it
+if has("win32") 
+	au! bufwritepost .vimrc so ~\.vimrc
+else
+	au! bufwritepost .vimrc so ~/.vimrc
+
+    if has("gui_running")
+        au! bufwritepost .gvimrc so ~/.gvimrc
+    endif
+endif
+
+
+" clearly
+au InsertLeave * set nopaste
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Use the "system clipboard"
+set cb=unnamed
+
+" Let mouse ScrollWheel work in terminal
+set mouse=a
+map <ScrollWheelUp> <C-Y>
+map <ScrollWheelDown> <C-E>
+
+set ruler    " Always show the current position 
+set hidden   " Change buffers without having to save
+
+if v:version > 700
+    " set cursorline
+    hi CursorLine term=inverse cterm=NONE ctermbg=234 guibg=234
+    au WinLeave * set nocursorline 
+    au WinEnter * set cursorline 
+endif
+
+" tmux will only forward escape sequences to the terminal if surrounded by a DCS sequence
+" http://sourceforge.net/mailarchive/forum.php?thread_name=AANLkTinkbdoZ8eNR1X2UobLTeww1jFrvfJxTMfKSq-L%2B%40mail.gmail.com&forum_name=tmux-users
+if exists('$TMUX')
+  let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+  let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+else
+  let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+  let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+endif
+
+" Set an orange cursor in insert mode, and a red cursor otherwise.
+" Works at least for xterm and rxvt terminals.
+" Does not work for gnome terminal, konsole, xfce4-terminal.
+" if &term =~ "xterm\\|rxvt\\|xterm-256color"
+"    :silent !echo -ne "\033]12;red\007"
+"    let &t_SI = "\033]12;orange\007"
+"    let &t_EI = "\033]12;red\007"
+"    autocmd VimLeave * :!echo -ne "\033]12;red\007"
+" endif
+
+" Ensure proper behavior for the backspace key
+set backspace=indent,eol,start
+
+" Ensure diff is vertical by default
+set diffopt=vertical
+
+" makes ~ act as an operator
+set tildeop
+
+" Make search expressions "very magic"
+nnoremap / /\v
+vnoremap / /\v
+
+" Be smart about case-sensitive searches
+set ignorecase
+set smartcase
+
+" By default, match every occurrence in a line, not just the first one
+set gdefault
+
+
+set incsearch              " Match while you type your search criteria
+set showmatch              " Call attention to the matching bracket
+set hlsearch               " Highlight all matches
+set mat=5                  " duration to show matching brace (1/10 sec)
+set laststatus=2           " always show the status line
+set visualbell             " turn this puppy off
+set colorcolumn=80         " for long lines (yes, 80 is archaeic)
 set wildmenu               " turn on wild menu
 set wildmode=list:longest,full
-set colorcolumn=80         " for long lines (yes, 80 is archaeic)
-set ch=2                   " command line height
-set backspace=2            " allow backspacing over everything in insert mode
-set whichwrap+=<,>,h,l,[,] " backspace and cursor keys wrap to
 set shortmess=filtIoOA     " shorten messages
 set report=0               " tell us about changes
 set nostartofline          " don't jump to the start of line when scrolling
+set virtualedit=block      " allow virtual edit in visual block ..
+set formatoptions+=qrn1    " support for numbered/bullet lists
+" set list listchars=tab:»»,trail:·
 
-" backup files are more of a bother than anything else
-set nobackup
-set nowritebackup
-
-
-" ----------------------------------------------------------------------------
-" Visual Cues
-" ----------------------------------------------------------------------------
-
-set showmatch              " brackets/braces that is
-set mat=5                  " duration to show matching brace (1/10 sec)
-set incsearch              " do incremental searching
-set laststatus=2           " always show the status line
-set visualbell             " shut the fuck up
+" Makes it easy to turn off highlighted matches
+nnoremap <leader><space> :noh<cr>
 
 
-" ----------------------------------------------------------------------------
-" Searching
-" ----------------------------------------------------------------------------
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => *Colors_and_Fonts*
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" just use normal regexs
-nnoremap / /\v
-vnoremap / /\v
-set ignorecase             " ignore case when searching
-set smartcase              " don't ignore case if using any uppercase
-set nohlsearch             " don't highlight searches
+" Force 256 colors
+set t_Co=256
+
+if has("gui_running")
+	set go-=T " remove toolbar
+	set go-=r " remove scrollbar
+endif
+
+let g:solarized_termcolors=256
+" colorscheme solarized
+set background=dark
+
+set encoding=ISO-8859-1
+
+try 
+	lang en_US
+catch
+endtry
+
+" Default file types
+set ffs=unix,dos,mac
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Moving_Around
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Make navigation between window splits easier
+map <C-j> <C-w>j<C-w>_
+map <C-k> <C-w>k<C-w>_
+map <C-h> <C-w>h<C-w>
+map <C-l> <C-w>l<C-w>
+
+" Relative line numbers are convenient for non-:ex movements
+if version >= 703
+    function! ToggleLineNumbers()
+            if &nu
+                set rnu
+            else
+                set nu
+            endif
+    endfunction
+    :nnoremap <silent> <F2> :call ToggleLineNumbers()<cr>
+
+    set rnu
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Buffer_Management
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Use the arrows for something useful, like moving among buffers,
+" Disables up and down arrows while in normal mode - use j and k, duh
+" Disables arrows during insert mode as well.
+nnoremap <right> :bn<cr>
+nnoremap <left> :bp<cr>
+
+" Easier buffer selection by number
+nnoremap <leader>b :ls<cr>:b<Space>
+
+" Follow the open buffer
+if version >= 703
+    set autochdir
+endif
+
+" Easy printing
+map <S-F12> :hardcopy<cr>
 
 
-" ----------------------------------------------------------------------------
-" Command-T Options
-" ----------------------------------------------------------------------------
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Files_and_Backups
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Rely on version control more than Vim backups
+" set nobackup
+" set nowb
+" set noswapfile
 
-let g:CommandTMaxFiles=100000
-set wildignore+=*.o,obj-ff-*/**,.git,.hg
+" Persistent undo
+" try
+" 	if has("win32")
+" 		set undodir=C:\Windows\Temp
+" 	else
+" 		set undodir=~/.vim/undodir
+" 	endif
+" 	set undofile
+" catch
+" endtry
 
+" allows a command of :w!! to force a save as root
+" NOTE: seems to be built in with just :w!
+cmap w!! %!sudo tee > /dev/null %
 
-" ---------------------------------------------------------------------------
-"  Strip all trailing whitespace in file
-" ---------------------------------------------------------------------------
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Tabs_and_Indent
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+set autoindent
+set smartindent
 
-function! StripWhitespace ()
-    exec ':%s/ \+$//gc'
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Editing_Mappings
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Strip all trailing whitespace in the current file
+function! TrimTrailingWhitespace()
+    if !&binary && &filetype != 'diff'
+        %s/\s\+$//e
+    endif
 endfunction
-map <leader>s :call StripWhitespace ()<CR>
+
+" tComment
+nmap <leader>c gcc
+vmap <leader>c gcc<ESC>
+
+" Sparkup Settings
+let g:sparkupExecuteMapping='<C-q>'
+let g:sparkupNextMapping='<C-w>'
+
+" CSS Tidy
+" autocmd filetype css setlocal equalprg=csstidy\ -\ --silent=true\ --preserve_css=true
+
+" pretty format JSON
+" to get json_xs, use `sudo cpan JSON::XS`
+map <leader>jt  <Esc>:%!json_xs -f json -t json-pretty
+
+command! ReverseWord call ReverseWord()
+function! ReverseWord()
+perl << EOF
+    $curword = VIM::Eval('expand("<cword>")');
+    $reversed = reverse($curword);
+    VIM::Msg("$curword => $reversed");
+    VIM::DoCommand("norm lbcw$reversed");
+EOF
+endfun
+
+" Hex mode on and off
+map <Leader>hon :%!xxd<CR>
+map <Leader>hof :%!xxd -r<CR>
+
+au FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"
+
+function! EscapeText(text)
+    let l:escaped_text = a:text
+
+    " Map characters to named C backslash escapes. Normally, single-quoted
+    " strings don't require double-backslashing, but these are necessary
+    " to make the substitute() call below work properly.
+    "
+    let l:charmap = {
+    \   '"'     : '\\"',
+    \   "'"     : '\\''',
+    \   "\n"    : '\\n',
+    \   "\r"    : '\\r',
+    \   "\b"    : '\\b',
+    \   "\t"    : '\\t',
+    \   "\x07"  : '\\a',
+    \   "\x0B"  : '\\v',
+    \   "\f"    : '\\f',
+    \   "\/"    : '\\/',
+    \   }
+
+    " Escape any existing backslashes in the text first, before
+    " generating new ones. (Vim dictionaries iterate in arbitrary order,
+    " so this step can't be combined with the items() loop below.)
+    "
+    let l:escaped_text = substitute(l:escaped_text, "\\", '\\\', 'g')
+
+    " Replace actual returns, newlines, tabs, etc., with their escaped
+    " representations.
+    "
+    for [original, escaped] in items(charmap)
+        let l:escaped_text = substitute(l:escaped_text, original, escaped, 'g')
+    endfor
+
+    " Replace any other character that isn't a letter, number,
+    " punctuation, or space with a 3-digit octal escape sequence. (Octal
+    " is used instead of hex, since octal escapes terminate after 3
+    " digits. C allows hex escapes of any length, so it's possible for
+    " them to run up against subsequent characters that might be valid
+    " hex digits.)
+    "
+    let l:escaped_text = substitute(l:escaped_text,
+    \   '\([^[:alnum:][:punct:] ]\)',
+    \   '\="\\o" . printf("%03o",char2nr(submatch(1)))',
+    \   'g')
+
+    return l:escaped_text
+endfunction
+
+function! PasteEscapedRegister(where)
+    " Remember current register name, contents, and type,
+    " so they can be restored once we're done.
+    "
+    let l:save_reg_name     = v:register
+    let l:save_reg_contents = getreg(l:save_reg_name, 1)
+    let l:save_reg_type     = getregtype(l:save_reg_name)
+
+    echo "register: [" . l:save_reg_name . "] type: [" . l:save_reg_type . "]"
+
+    " Replace the contents of the register with the escaped text, and set the
+    " type to characterwise (so pasting into an existing double-quoted string,
+    " for example, will work as expected).
+    " 
+    call setreg(l:save_reg_name, EscapeText(getreg(l:save_reg_name)), "c")
+
+    " Build the appropriate normal-mode paste command.
+    " 
+    let l:cmd = 'normal "' . l:save_reg_name . (a:where == "before" ? "P" : "p")
+
+    " Insert the escaped register contents.
+    "
+    exec l:cmd
+
+    " Restore the register to its original value and type.
+    " 
+    call setreg(l:save_reg_name, l:save_reg_contents, l:save_reg_type)
+endfunction
+
+" Define keymaps to paste escaped text before or after the cursor.
+nmap <Leader>P :call PasteEscapedRegister("before")<cr>
+nmap <Leader>p :call PasteEscapedRegister("after")<cr>
+
+nmap ,t :ToggleWord<CR>
+map <F9> :MRU<CR>
 
 
-" ---------------------------------------------------------------------------
-"  Show blame for the currently selected lines
-" ---------------------------------------------------------------------------
-map <leader>h :<C-U>!hg blame -fu <C-R>=expand("%:p") <CR> \| sed -n <C-R>=line("'<") <CR>,<C-R>=line("'>") <CR>p <CR>
+"""""""""""""""" START Find With Visual Selection """""""""""""""""
+
+" Search for selected text, forwards or backwards.
+vnoremap <silent> * :<C-U>
+  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
+  \gvy/<C-R><C-R>=substitute(
+  \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
+  \gV:call setreg('"', old_reg, old_regtype)<CR>
+vnoremap <silent> # :<C-U>
+  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
+  \gvy?<C-R><C-R>=substitute(
+  \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
+  \gV:call setreg('"', old_reg, old_regtype)<CR>
+
+"""""""""""""""" END Find With Visual Selection """""""""""""""""
 
 
-" ---------------------------------------------------------------------------
-" Split window veritcally & switch to the new window
-" ---------------------------------------------------------------------------
-map <leader>w :vs<CR><C-w>l
+"""""""""""""""" START Replace With Visual Selection """""""""""""""""
+
+" Escape special characters in a string for exact matching.
+" This is useful to copying strings from the file to the search tool
+" Based on this - http://peterodding.com/code/vim/profile/autoload/xolox/escape.vim
+function! EscapeString (string)
+  let string=a:string
+  " Escape regex characters
+  let string = escape(string, '^$.*\/~[]')
+  " Escape the line endings
+  let string = substitute(string, '\n', '\\n', 'g')
+  return string
+endfunction
+
+" Get the current visual block for search and replaces
+" This function passed the visual block through a string escape function
+" Based on this - http://stackoverflow.com/questions/676600/vim-replace-selected-text/677918#677918
+function! GetVisual() range
+  " Save the current register and clipboard
+  let reg_save = getreg('"')
+  let regtype_save = getregtype('"')
+  let cb_save = &clipboard
+  set clipboard&
+
+  " Put the current visual selection in the " register
+  normal! ""gvy
+  let selection = getreg('"')
+
+  " Put the saved registers and clipboards back
+  call setreg('"', reg_save, regtype_save)
+  let &clipboard = cb_save
+
+  "Escape any special characters in the selection
+  let escaped_selection = EscapeString(selection)
+
+  return escaped_selection
+endfunction
+
+" Start the find and replace command across the entire file
+" vmap <leader>r <Esc>:%s/<c-r>=GetVisual()<cr>/
+vnoremap <silent> r <Esc>:%s/<c-r>=GetVisual()<cr>/
+
+"""""""""""""""" END Replace With Visual Selection """""""""""""""""
+
+
+" This pretty much disables tabs. Which is fine with me!
+autocmd BufWinEnter,BufNewFile * silent tabo
+
+
+syntax on    " Enable syntax highlighting
