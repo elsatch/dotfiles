@@ -1,3 +1,6 @@
+export CLICOLOR=1
+
+
 alias xcode='open -a xcode'
 alias pre='open -a Preview'
 alias l='ls -al'
@@ -12,8 +15,12 @@ alias wgetssl='wget --no-check-certificate'
 
 function ta()
 {
+    # use this to find out what to set TMPDIR to if ta() wasn't used:
+    # `echo /var/folders/**/*/-Tmp-(U/)`
+    # then attache with `TMPDIR=$$ tmux attach`
+
     unset TMPDIR
-    if [ `tmux list-sessions 2>&1 | grep "^failed to connect to server" -c` -eq 0 ];
+    if [[ `tmux list-sessions 2>&1 | grep "^failed to connect to server" -c` -eq 0 ]];
     then
         tmux attach 
     else
@@ -21,7 +28,7 @@ function ta()
     fi
 }
 
-cdf ()
+function cdf ()
 {
   CURRFOLDERPATH=$( /usr/bin/osascript <<"    EOT"
     tell application "Finder"
@@ -46,11 +53,11 @@ function flushdns()
     # sudo port load dnsmasq
 }
 
-gih () { identify -format "%h" "$@" | tr -d '\n' | pbcopy; }
-giw () { identify -format "%w" "$@" | tr -d '\n' | pbcopy; }
-mkcd () { mkdir -p "$@" && cd "$@"; }
+function gih () { identify -format "%h" "$@" | tr -d '\n' | pbcopy; }
+function giw () { identify -format "%w" "$@" | tr -d '\n' | pbcopy; }
+function mkcd () { mkdir -p "$@" && cd "$@"; }
 
-extract () {
+function extract () {
     if [ -f $1 ] ; then
         case $1 in
             *.tar.bz2)  tar xjf $1      ;;
@@ -99,16 +106,14 @@ alias firefox='/Applications/Firefox.app/Contents/MacOS/firefox-bin -profilemana
 
 #function mirror_page_old() { wget --ignore-length --mirror --page-requisites --convert-links --no-verbose --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:6.0) Gecko/20100101 Firefox/6.0" --directory-prefix=./ $1 }
 
-function mirror_page() { wget --adjust-extension --page-requisites --span-hosts --backup-converted --ignore-length --convert-links --no-verbose --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:6.0) Gecko/20100101 Firefox/6.0" --directory-prefix=./ $1 }
-
+# function mirror_page() { wget --adjust-extension --page-requisites --span-hosts --backup-converted --ignore-length --convert-links --no-verbose --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:6.0) Gecko/20100101 Firefox/6.0" --directory-prefix=./ $1 }
+ 
 alias linecount="sed '/^\s*$/d' | wc -l"
 
 function expandurl() { curl -sIL $1 | grep ^Location; }
 
-mygrants()
+function mygrants()
 {
-  mysql -B -N $@ -e "SELECT DISTINCT CONCAT('SHOW GRANTS FOR ''', user, '''@''', host, ''';') AS query FROM mysql.user" | \
-  mysql $@ | \
-  sed 's/\(GRANT .*\)/\1;/;s/^\(Grants for .*\)/## \1 ##/;/##/{x;p;x;}'
+  mysql -B -N $@ -e "SELECT DISTINCT CONCAT('SHOW GRANTS FOR ''', user, '''@''', host, ''';') AS query FROM mysql.user" | mysql $@ | sed 's/\(GRANT .*\)/\1;/;s/^\(Grants for .*\)/## \1 ##/;/##/{x;p;x;}'
 }
 
