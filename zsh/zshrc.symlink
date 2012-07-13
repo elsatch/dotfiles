@@ -31,6 +31,8 @@ COMPLETION_WAITING_DOTS="true"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 plugins=(git macports vi-mode svn osx mysql-macports apache2-macports)
 
+source ~/.dotfiles/system/path.zsh
+
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
@@ -41,5 +43,8 @@ if [[ -a ~/.localrc ]]
 then
   source ~/.localrc
 fi
+
+source ~/.dotfiles/system/aliases.zsh
+source ~/.dotfiles/system/keys.zsh
 
 bindkey -M vicmd v edit-command-line
