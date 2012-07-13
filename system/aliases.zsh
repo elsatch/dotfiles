@@ -117,3 +117,7 @@ function mygrants()
   mysql -B -N $@ -e "SELECT DISTINCT CONCAT('SHOW GRANTS FOR ''', user, '''@''', host, ''';') AS query FROM mysql.user" | mysql $@ | sed 's/\(GRANT .*\)/\1;/;s/^\(Grants for .*\)/## \1 ##/;/##/{x;p;x;}'
 }
 
+# brought here from dotfiles/zsh/aliases.zsh before it was deleted
+alias dotf='cd $ZSH'
+alias findps='ps aux | grep -v grep | grep'
+alias reload!='. ~/.zshrc'
