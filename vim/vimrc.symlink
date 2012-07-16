@@ -308,6 +308,9 @@ perl << EOF
 EOF
 endfun
 
+" show number of occurences of a word under the cursor
+" map <f5> :execute ":%s@\\<" . expand("<cword>") . "\\>\@&@gn"<CR>
+
 " Hex mode on and off
 map <Leader>hon :%!xxd<CR>
 map <Leader>hof :%!xxd -r<CR>
