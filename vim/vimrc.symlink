@@ -28,6 +28,10 @@ nnoremap <leader><leader> <c-^>
 inoremap jj <ESC>
 inoremap kk <ESC>
 
+" holy smokes I have caps lock on.
+nnoremap JJJJ <Nop>
+nnoremap KKKK <Nop>
+
 " Visually select the text that was last edited/pasted
 noremap gV `[v`]
 
@@ -40,9 +44,16 @@ nmap <C-Down> ]e
 vmap <C-Up> [egv
 vmap <C-Down> ]egv
 
-" Better movement with wrapped lines
+" Sane movement with wrapped lines
 nnoremap j gj
 nnoremap k gk
+" g0 \
+" g$ _> These work, but don't map them. Just remember them!
+
+" Sane movement with wrapped lines in insert mode
+inoremap <silent> <Up> <Esc>gka
+inoremap <silent> <Down> <Esc>gja
+
 
 " Reselect visual block after indent/outdent
 vnoremap < <gv
