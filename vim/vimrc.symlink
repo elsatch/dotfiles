@@ -165,7 +165,7 @@ set incsearch              " Match while you type your search criteria
 set showmatch              " Call attention to the matching bracket
 set hlsearch               " Highlight all matches
 set mat=5                  " duration to show matching brace (1/10 sec)
-set laststatus=2           " always show the status line
+" set laststatus=2           " always show the status line
 set visualbell             " turn this puppy off
 " set colorcolumn=80         " for long lines (yes, 80 is archaeic)
 set wildmenu               " turn on wild menu
