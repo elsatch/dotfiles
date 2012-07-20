@@ -28,6 +28,10 @@ nnoremap <leader><leader> <c-^>
 inoremap jj <ESC>
 inoremap kk <ESC>
 
+" holy smokes I have caps lock on.
+nnoremap JJJJ <Nop>
+nnoremap KKKK <Nop>
+
 " Visually select the text that was last edited/pasted
 noremap gV `[v`]
 
@@ -40,9 +44,16 @@ nmap <C-Down> ]e
 vmap <C-Up> [egv
 vmap <C-Down> ]egv
 
-" Better movement with wrapped lines
+" Sane movement with wrapped lines
 nnoremap j gj
 nnoremap k gk
+" g0 \
+" g$ _> These work, but don't map them. Just remember them!
+
+" Sane movement with wrapped lines in insert mode
+inoremap <silent> <Up> <Esc>gka
+inoremap <silent> <Down> <Esc>gja
+
 
 " Reselect visual block after indent/outdent
 vnoremap < <gv
@@ -154,7 +165,7 @@ set incsearch              " Match while you type your search criteria
 set showmatch              " Call attention to the matching bracket
 set hlsearch               " Highlight all matches
 set mat=5                  " duration to show matching brace (1/10 sec)
-set laststatus=2           " always show the status line
+" set laststatus=2           " always show the status line
 set visualbell             " turn this puppy off
 " set colorcolumn=80         " for long lines (yes, 80 is archaeic)
 set wildmenu               " turn on wild menu
@@ -459,7 +470,7 @@ endfunction
 
 " Start the find and replace command across the entire file
 " vmap <leader>r <Esc>:%s/<c-r>=GetVisual()<cr>/
-vnoremap <silent> r <Esc>:%s/<c-r>=GetVisual()<cr>/
+vnoremap <silent> R <Esc>:%s/<c-r>=GetVisual()<cr>/
 
 """""""""""""""" END Replace With Visual Selection """""""""""""""""
 
