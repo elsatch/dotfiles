@@ -470,7 +470,7 @@ endfunction
 
 " Start the find and replace command across the entire file
 " vmap <leader>r <Esc>:%s/<c-r>=GetVisual()<cr>/
-vnoremap <silent> r <Esc>:%s/<c-r>=GetVisual()<cr>/
+vnoremap <silent> R <Esc>:%s/<c-r>=GetVisual()<cr>/
 
 """""""""""""""" END Replace With Visual Selection """""""""""""""""
 
