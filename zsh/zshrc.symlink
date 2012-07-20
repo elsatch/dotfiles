@@ -31,6 +31,10 @@ COMPLETION_WAITING_DOTS="true"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 plugins=(git macports vi-mode svn osx mysql-macports apache2-macports)
 
+if [[ "$OSTYPE" = cygwin ]]; then
+    plugins=(vi-mode)
+fi
+
 source ~/.dotfiles/system/path.zsh
 
 source $ZSH/oh-my-zsh.sh
