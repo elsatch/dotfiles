@@ -71,6 +71,10 @@ inoremap <C-BS> <Esc>dbxa
 " Fast saving with "<leader>s"
 nmap <leader>s :w!<cr>
 
+" allow . and @@ to execute once for each line of a visual selection
+vnoremap . :normal .<CR>
+vnoremap @@ :normal @@<CR>
+
 nnoremap <tab> %
 vnoremap <tab> %
 
