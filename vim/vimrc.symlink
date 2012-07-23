@@ -73,7 +73,7 @@ nmap <leader>s :w!<cr>
 
 " allow . and @@ to execute once for each line of a visual selection
 vnoremap . :normal .<CR>
-vnoremap @@ :normal @@<CR>
+vnoremap @@ :normal @@
 
 nnoremap <tab> %
 vnoremap <tab> %
