@@ -28,23 +28,6 @@ function ta()
     fi
 }
 
-function cdf ()
-{
-  CURRFOLDERPATH=$( /usr/bin/osascript <<"    EOT"
-    tell application "Finder"
-      try
-          set currFolder to (folder of the front window as alias)
-      on error
-          set currFolder to (path to desktop folder as alias)
-      end try
-      POSIX path of currFolder
-    end tell
-    EOT
-  )
-  echo "cd to \"$CURRFOLDERPATH\""
-  cd "$CURRFOLDERPATH"
-}
-
 function flushdns()
 {
     dscacheutil -flushcache
@@ -94,9 +77,9 @@ alias fpm54_start='sudo php-fpm54'
 alias fpm54_restart='fpm54_stop; fpm54_start'
 
 # mysql
-alias mysql_start='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wrapper start'
-alias mysql_stop='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wrapper stop'
-alias mysql_restart='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wrapper restart'
+alias mysql_start='sudo /opt/local/bin/mysqld_safe5 &'
+alias mysql_stop='sudo /opt/local/bin/mysqladmin5 -u -root shutdown'
+alias mysql_restart='mysql_stop; mysql_start'
 
 # apache
 alias restart_apache='sudo /opt/local/apache2/bin/apachectl restart'
@@ -126,3 +109,22 @@ function mygrants()
 alias dotf='cd $ZSH'
 alias findps='ps aux | grep -v grep | grep'
 alias reload!='. ~/.zshrc'
+
+
+function cdf ()
+{
+  CURRFOLDERPATH=$( /usr/bin/osascript <<"    EOT"
+    tell application "Finder"
+      try
+          set currFolder to (folder of the front window as alias)
+      on error
+          set currFolder to (path to desktop folder as alias)
+      end try
+      POSIX path of currFolder
+    end tell
+    EOT
+  )
+  echo "cd to \"$CURRFOLDERPATH\""
+  cd "$CURRFOLDERPATH"
+}
+
