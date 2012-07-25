@@ -83,10 +83,15 @@ alias nginx_stop='sudo kill `cat /opt/local/var/run/nginx/nginx.pid`'
 alias nginx_test_config='sudo nginx -t'
 alias nginx_reload='sudo nginx -s reload'
 
-# php-fpm
-alias fpm_stop='sudo kill `cat /opt/local/var/run/php-fpm.pid`'
-alias fpm_start='sudo php-fpm'
-alias fpm_restart='fpm_stop; fpm_start'
+# php-fpm53
+alias fpm53_stop='sudo kill `cat /opt/local/var/run/php53/php-fpm.pid`'
+alias fpm53_start='sudo php-fpm53'
+alias fpm53_restart='fpm53_stop; fpm53_start'
+
+# php-fpm54
+alias fpm54_stop='sudo kill `cat /opt/local/var/run/php54/php-fpm.pid`'
+alias fpm54_start='sudo php-fpm54'
+alias fpm54_restart='fpm54_stop; fpm54_start'
 
 # mysql
 alias mysql_start='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wrapper start'
