@@ -77,8 +77,8 @@ alias fpm54_start='sudo php-fpm54'
 alias fpm54_restart='fpm54_stop; fpm54_start'
 
 # mysql
-alias mysql_start='sudo /opt/local/bin/mysqld_safe5 &'
-alias mysql_stop='sudo /opt/local/bin/mysqladmin5 -u -root shutdown'
+alias mysql_start='sudo /opt/local/share/mysql5/mysql/mysql.server start'
+alias mysql_stop='sudo /opt/local/share/mysql5/mysql/mysql.server stop'
 alias mysql_restart='mysql_stop; mysql_start'
 
 # apache
