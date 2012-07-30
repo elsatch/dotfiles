@@ -91,8 +91,22 @@ map <F3> :e ~/.vimrc<cr>
 
 " When Vim configuration file is edited, reload it
 if has("win32") 
-	au! bufwritepost .vimrc so ~\.vimrc
+    " Set font in windows
+    set gfn=Consolas:h10:cDEFAULT
+
+    " Fast editing of the Vim configuration file
+    map <F3> :e ~/_vimrc<cr>
+
+    " When Vim configuration file is edited, reload it
+	au! bufwritepost _vimrc so ~/_vimrc
+
+    if has("gui_running")
+        au! bufwritepost _gvimrc so ~/_gvimrc
+    endif
 else
+    " Fast editing of the Vim configuration file
+    map <F3> :e ~/.vimrc<cr>
+
 	au! bufwritepost .vimrc so ~/.vimrc
 
     if has("gui_running")
@@ -119,7 +133,7 @@ set hidden   " Change buffers without having to save
 
 if v:version > 700
     " set cursorline
-    hi CursorLine term=inverse cterm=NONE ctermbg=234 guibg=234
+    " hi CursorLine term=inverse cterm=NONE ctermbg=234 guibg=234
     au WinLeave * set nocursorline 
     au WinEnter * set cursorline 
 endif
@@ -198,10 +212,11 @@ if has("gui_running")
 endif
 
 let g:solarized_termcolors=256
-" colorscheme solarized
+colorscheme solarized
 set background=dark
 
-set encoding=ISO-8859-1
+" set encoding=ISO-8859-1
+set encoding=UTF-8 
 
 try 
 	lang en_US
