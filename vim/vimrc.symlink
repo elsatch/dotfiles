@@ -71,6 +71,10 @@ inoremap <C-BS> <Esc>dbxa
 " Fast saving with "<leader>s"
 nmap <leader>s :w!<cr>
 
+" allow . and @@ to execute once for each line of a visual selection
+vnoremap . :normal .<CR>
+vnoremap @@ :normal @@
+
 nnoremap <tab> %
 vnoremap <tab> %
 
@@ -474,9 +478,21 @@ vnoremap <silent> R <Esc>:%s/<c-r>=GetVisual()<cr>/
 
 """""""""""""""" END Replace With Visual Selection """""""""""""""""
 
+" Search google (In Chrome) with alt+g
+function! Terms()
+  call inputsave()
+  let searchterm = input('Search: ')
+  call inputrestore()
+  return searchterm
+endfunction
+map © <ESC>:! /usr/bin/open -a "/Applications/Google Chrome.app" 'https://google.com/search?q=<C-R>=Terms()<CR>'<CR><CR>
+
 
 " This pretty much disables tabs. Which is fine with me!
 autocmd BufWinEnter,BufNewFile * silent tabo
+
+" Look into this for split swapping:
+" http://stackoverflow.com/questions/2586984/how-can-i-swap-positions-of-two-open-files-in-splits-in-vim
 
 
 syntax on    " Enable syntax highlighting

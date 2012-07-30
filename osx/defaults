@@ -17,6 +17,9 @@ defaults write com.apple.screensaver askForPasswordDelay -int 0
 # Show all filename extensions in Finder
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
+# Show all files (including hidden dotfiles
+defaults write com.apple.Finder AppleShowAllFiles YES
+
 # Show status bar in Finder
 defaults write com.apple.finder ShowStatusBar -bool true
 
