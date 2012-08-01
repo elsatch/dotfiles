@@ -52,3 +52,4 @@ source ~/.dotfiles/system/aliases.zsh
 source ~/.dotfiles/system/keys.zsh
 
 bindkey -M vicmd v edit-command-line
+bindkey  "^[[3~" delete-char
