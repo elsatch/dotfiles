@@ -113,6 +113,29 @@ alias dotf='cd $ZSH'
 alias findps='ps aux | grep -v grep | grep'
 alias reload!='. ~/.zshrc'
 
+function mlregex() {
+    if [[ "$#" != "1" ]]; then
+        return
+    fi
+
+    x="$1"
+    len=${#x}
+    final=''
+    joiner='\+\s*n?^\s*'
+
+    for ((i = 1; i < $len+1; i++));
+        do
+            if [[ $i -ne 1 ]]; then
+                final="$final|"
+            fi
+
+            final=${final}${x:0:$i}${joiner}${x:$i:$len}
+        done
+
+
+    return $final
+}
+
 
 function cdf ()
 {
