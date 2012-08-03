@@ -124,7 +124,7 @@ function mlregex() {
     # joiner='\\\\+\\\\s*\\\\n?^\\\\s*'
     joiner='\\+\\s*\\n?^\\s*'
 
-    for ((i = 1; i < $len+1; i++));
+    for ((i = 1; i < $len; i++));
         do
             if [[ $i -ne 1 ]]; then
                 final="$final|"
@@ -133,7 +133,7 @@ function mlregex() {
             final="${final}${x:0:$i}${joiner}${x:$i:$len}"
         done
 
-        echo -n $final
+        echo -n "$final|$x"
 
     # return $final
 }
