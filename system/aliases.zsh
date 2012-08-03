@@ -121,7 +121,8 @@ function mlregex() {
     x="$1"
     len=${#x}
     final=''
-    joiner='\+\s*n?^\s*'
+    # joiner='\\\\+\\\\s*\\\\n?^\\\\s*'
+    joiner='\\+\\s*\\n?^\\s*'
 
     for ((i = 1; i < $len+1; i++));
         do
@@ -129,11 +130,12 @@ function mlregex() {
                 final="$final|"
             fi
 
-            final=${final}${x:0:$i}${joiner}${x:$i:$len}
+            final="${final}${x:0:$i}${joiner}${x:$i:$len}"
         done
 
+        echo -n $final
 
-    return $final
+    # return $final
 }
 
 
