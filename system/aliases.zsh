@@ -138,6 +138,10 @@ function mlregex() {
     # return $final
 }
 
+function expand-url() { 
+    wget -q -U Mozilla/5 -O/dev/null -S $@ 2>&1 | awk '{ if($1~/^Location:/) { print $2 } }';
+}
+
 
 function cdf ()
 {
