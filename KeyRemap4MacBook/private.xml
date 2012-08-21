@@ -1,16 +1,13 @@
 <?xml version="1.0"?>
 <root>
-
   <appdef>
     <appname>VMWAREVIEW</appname>
     <equal>com.vmware.view</equal>
   </appdef>
-
   <item>
     <name>Map Fn+Cmd+i to [insert]</name>
     <identifier>private.appdef.vmwareview.insert</identifier>
     <only>VMWAREVIEW</only>
-    <autogen>--KeyToKey-- KeyCode::I, VK_COMMAND | ModifierFlag::FN, KeyCode::PC_INSERT</autogen>
+    <autogen>--KeyToKey-- KeyCode::I, VK_CONTROL | ModifierFlag::FN, KeyCode::PC_INSERT</autogen>
   </item>
-
 </root>
