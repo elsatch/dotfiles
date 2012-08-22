@@ -207,8 +207,7 @@ nnoremap <leader><space> :noh<cr>
 set t_Co=256
 
 if has("gui_running")
-	set go-=T " remove toolbar
-	set go-=r " remove scrollbar
+    set go=
 endif
 
 let g:solarized_termcolors=256
