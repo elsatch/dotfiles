@@ -142,6 +142,7 @@ function expand-url() {
     wget -q -U Mozilla/5 -O/dev/null -S $@ 2>&1 | awk '{ if($1~/^Location:/) { print $2 } }';
 }
 
+function base64 () { openssl base64 < "$1" | tr -d '\n' | pbcopy }
 
 function cdf ()
 {
@@ -159,4 +160,3 @@ function cdf ()
   echo "cd to \"$CURRFOLDERPATH\""
   cd "$CURRFOLDERPATH"
 }
-
