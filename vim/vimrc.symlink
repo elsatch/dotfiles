@@ -28,10 +28,6 @@ nnoremap <leader><leader> <c-^>
 inoremap jj <ESC>
 inoremap kk <ESC>
 
-" holy smokes I have caps lock on.
-nnoremap JJJJ <Nop>
-nnoremap KKKK <Nop>
-
 " Visually select the text that was last edited/pasted
 noremap gV `[v`]
 
