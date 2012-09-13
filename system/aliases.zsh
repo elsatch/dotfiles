@@ -113,6 +113,8 @@ alias dotf='cd $ZSH'
 alias findps='ps aux | grep -v grep | grep'
 alias reload!='. ~/.zshrc'
 
+function ytmp3() { youtube-dl -kvt --extract-audio --audio-quality 160k --audio-format mp3 $1 }
+
 function mlregex() {
     if [[ "$#" != "1" ]]; then
         return
