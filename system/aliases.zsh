@@ -113,6 +113,8 @@ alias dotf='cd $ZSH'
 alias findps='ps aux | grep -v grep | grep'
 alias reload!='. ~/.zshrc'
 
+function ytmp3() { youtube-dl -kvt --extract-audio --audio-quality 160k --audio-format mp3 $1 }
+
 function mlregex() {
     if [[ "$#" != "1" ]]; then
         return
@@ -138,6 +140,11 @@ function mlregex() {
     # return $final
 }
 
+function expand-url() { 
+    wget -q -U Mozilla/5 -O/dev/null -S $@ 2>&1 | awk '{ if($1~/^Location:/) { print $2 } }';
+}
+
+function base64 () { openssl base64 < "$1" | tr -d '\n' | pbcopy }
 
 function cdf ()
 {
@@ -155,4 +162,3 @@ function cdf ()
   echo "cd to \"$CURRFOLDERPATH\""
   cd "$CURRFOLDERPATH"
 }
-

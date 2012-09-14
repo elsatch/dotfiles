@@ -11,4 +11,4 @@ if has("gui_macvim")
 endif
 
 set anti
-set guioptions=egmrt
+" set guioptions=egmrt

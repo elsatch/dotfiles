@@ -28,10 +28,6 @@ nnoremap <leader><leader> <c-^>
 inoremap jj <ESC>
 inoremap kk <ESC>
 
-" holy smokes I have caps lock on.
-nnoremap JJJJ <Nop>
-nnoremap KKKK <Nop>
-
 " Visually select the text that was last edited/pasted
 noremap gV `[v`]
 
@@ -207,8 +203,7 @@ nnoremap <leader><space> :noh<cr>
 set t_Co=256
 
 if has("gui_running")
-	set go-=T " remove toolbar
-	set go-=r " remove scrollbar
+    set go=
 endif
 
 let g:solarized_termcolors=256
@@ -487,6 +482,29 @@ function! GetVisual() range
   return escaped_selection
 endfunction
 
+"hacky
+function! GetUnescapedVisual() range
+  " Save the current register and clipboard
+  let reg_save = getreg('"')
+  let regtype_save = getregtype('"')
+  let cb_save = &clipboard
+  set clipboard&
+
+  " Put the current visual selection in the " register
+  normal! ""gvy
+  let selection = getreg('"')
+
+  " Put the saved registers and clipboards back
+  call setreg('"', reg_save, regtype_save)
+  let &clipboard = cb_save
+
+  " "Escape any special characters in the selection
+  " let escaped_selection = EscapeString(selection)
+
+  " return escaped_selection
+  return selection
+endfunction
+
 " Start the find and replace command across the entire file
 " vmap <leader>r <Esc>:%s/<c-r>=GetVisual()<cr>/
 vnoremap <silent> R <Esc>:%s/<c-r>=GetVisual()<cr>/
@@ -501,6 +519,8 @@ function! Terms()
   return searchterm
 endfunction
 map © <ESC>:! /usr/bin/open -a "/Applications/Google Chrome.app" 'https://google.com/search?q=<C-R>=Terms()<CR>'<CR><CR>
+map ƒ <ESC>:! /usr/bin/open -a "/Applications/Google Chrome.app" 'https://google.com/search?q=<C-R>=GetUnescapedVisual()<CR>'<CR><CR>
+
 
 
 " This pretty much disables tabs. Which is fine with me!
@@ -508,6 +528,70 @@ autocmd BufWinEnter,BufNewFile * silent tabo
 
 " Look into this for split swapping:
 " http://stackoverflow.com/questions/2586984/how-can-i-swap-positions-of-two-open-files-in-splits-in-vim
+"
+"
+
+if exists("g:confirm_quit") || &cp
+    finish
+endif
+let g:confirm_quit = 1
+
+if has("gui_running") && has("win32")
+    function! ConfirmQuit(writeFile)
+        if (a:writeFile)
+            if (expand("#")=="")
+                echo "Can't save a file with no name."
+                return
+            endif
+            write
+        endif
+
+        let l:confirmed = confirm("Do you really want to quit?", "&Yes\n&No", 2)
+        if l:confirmed == 1
+            quit
+        endif
+    endfu
+
+    cnoremap <silent> q<cr>  call ConfirmQuit(0)<cr>
+    cnoremap <silent> wq<cr> call ConfirmQuit(1)<cr>
+    cnoremap <silent> x<cr> call ConfirmQuit(1)<cr>
+endif
+
+
+"------ shows how the next set of mappings works ------"
+" gcw        - capitalize word (from cursor position to end of word)
+" gcW        - capitalize WORD (from cursor position to end of WORD)
+" gciw       - capitalize inner word (from start to end)
+" gciW       - capitalize inner WORD (from start to end)
+" gcis       - capitalize inner sentence
+" gc$        - capitalize until end of line (from cursor postition)
+" gcgc       - capitalize whole line (from start to end)
+" gcc        - capitalize whole line
+" {Visual}gc - capitalize highlighted text
+
+if (&tildeop)
+  nmap gcw guw~l
+  nmap gcW guW~l
+  nmap gciw guiw~l
+  nmap gciW guiW~l
+  nmap gcis guis~l
+  nmap gc$ gu$~l
+  nmap gcgc guu~l
+  nmap gcc guu~l
+  vmap gc gu~l
+else
+  nmap gcw guw~h
+  nmap gcW guW~h
+  nmap gciw guiw~h
+  nmap gciW guiW~h
+  nmap gcis guis~h
+  nmap gc$ gu$~h
+  nmap gcgc guu~h
+  nmap gcc guu~h
+  vmap gc gu~h
+endif
+
+
 
 
 syntax on    " Enable syntax highlighting
