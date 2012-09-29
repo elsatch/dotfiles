@@ -3,6 +3,7 @@ export CLICOLOR=1
 # macports update to all ports except pcre (pcre 8.30 breaks WP)
 alias macports_upgrade_cmd="sudo port upgrade `port list outdated | awk '{print $1}' | grep -v pcre | tr '\n' ' '`"
 
+alias revkitch='rsync -r ~/projects/revolutionkitchen/revkitch-theme/* kenny@web2:/www/wordpress/wp-content/themes/rk-bootstrap/'
 
 alias xcode='open -a xcode'
 alias pre='open -a Preview'

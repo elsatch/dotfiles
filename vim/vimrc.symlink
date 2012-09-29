@@ -110,6 +110,7 @@ else
     endif
 endif
 
+" autocmd FileType python set omnifunc=pythoncomplete#Complete
 
 " clearly
 au InsertLeave * set nopaste
@@ -426,6 +427,7 @@ nmap <Leader>p :call PasteEscapedRegister("after")<cr>
 nmap ,t :ToggleWord<CR>
 map <F9> :MRU<CR>
 
+" let $Tlist_Ctags_Cmd='/opt/local/bin/ctags'
 
 """""""""""""""" START Find With Visual Selection """""""""""""""""
 
@@ -590,6 +592,7 @@ else
   nmap gcc guu~h
   vmap gc gu~h
 endif
+
 
 
 
