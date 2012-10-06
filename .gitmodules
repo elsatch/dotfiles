@@ -80,12 +80,9 @@
 ; [submodule "vim/vim.symlink/bundle/vim-jade"]
 ; 	path = vim/vim.symlink/bundle/vim-jade
 ; 	url = https://github.com/digitaltoad/vim-jade.git
-[submodule "zsh/oh-my-zsh.symlink"]
-	path = zsh/oh-my-zsh.symlink
-	url = https://github.com/robbyrussell/oh-my-zsh.git
 [submodule "vim/vim.symlink/bundle/taglist.vim"]
 	path = vim/vim.symlink/bundle/taglist.vim
 	url = git://github.com/vim-scripts/taglist.vim.git
-[submodule "zsh/prezto.symlink"]
-	path = zsh/prezto.symlink
+[submodule "zsh/zprezto.symlink"]
+	path = zsh/zprezto.symlink
 	url = git@github.com:kyounger/prezto.git

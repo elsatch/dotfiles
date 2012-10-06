@@ -15,6 +15,7 @@ alias ttop='top -U $USER'
 alias lsd3='du -sk * | sort -nr | head -3'
 alias mvim='mvim --remote-tab-silent'
 alias wgetssl='wget --no-check-certificate'
+alias gst='git status'
 
 
 function ta()
