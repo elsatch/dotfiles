@@ -86,6 +86,3 @@
 [submodule "vim/vim.symlink/bundle/taglist.vim"]
 	path = vim/vim.symlink/bundle/taglist.vim
 	url = git://github.com/vim-scripts/taglist.vim.git
-[submodule "vim/vim.symlink/bundle/jedi-vim"]
-	path = vim/vim.symlink/bundle/jedi-vim
-	url = git://github.com/davidhalter/jedi-vim.git
