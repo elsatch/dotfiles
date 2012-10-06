@@ -86,3 +86,6 @@
 [submodule "vim/vim.symlink/bundle/taglist.vim"]
 	path = vim/vim.symlink/bundle/taglist.vim
 	url = git://github.com/vim-scripts/taglist.vim.git
+[submodule "zsh/prezto.symlink"]
+	path = zsh/prezto.symlink
+	url = git@github.com:kyounger/prezto.git
