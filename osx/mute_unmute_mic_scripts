@@ -1,2 +1,0 @@
-osacompile -x -e 'tell application "System Events" to set volume input volume 0' -o ~/bin/mute_mic.scpt
-osacompile -x -e 'tell application "System Events" to set volume input volume 100' -o ~/bin/unmute_mic.scpt
