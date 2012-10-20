@@ -303,6 +303,7 @@ set smartindent
 " => Editing_Mappings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Strip all trailing whitespace in the current file
+command! TrimTrailingWhitespace call TrimTrailingWhitespace()
 function! TrimTrailingWhitespace()
     if !&binary && &filetype != 'diff'
         %s/\s\+$//e
