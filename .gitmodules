@@ -89,3 +89,6 @@
 [submodule "vim/vim.symlink/bundle/splice.vim"]
 	path = vim/vim.symlink/bundle/splice.vim
 	url = https://github.com/sjl/splice.vim.git
+[submodule "vim/vim.symlink/bundle/vitality.vim"]
+	path = vim/vim.symlink/bundle/vitality.vim
+	url = git://github.com/sjl/vitality.vim.git
