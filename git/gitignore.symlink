@@ -11,3 +11,7 @@
 obj-*/
 configure
 .mozconfig*
+
+doc/tags/*
+doc/tags
+bundle/**/doc
