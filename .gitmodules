@@ -86,3 +86,6 @@
 [submodule "zsh/zprezto.symlink"]
 	path = zsh/zprezto.symlink
 	url = git@github.com:kyounger/prezto.git
+[submodule "vim/vim.symlink/bundle/splice.vim"]
+	path = vim/vim.symlink/bundle/splice.vim
+	url = https://github.com/sjl/splice.vim.git
