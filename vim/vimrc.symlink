@@ -594,7 +594,9 @@ else
   vmap gc gu~h
 endif
 
-
+"powerline stuff:
+let g:Powerline_symbols = 'fancy'
+let g:Powerline_cache_enabled = 1
 
 
 
