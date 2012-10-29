@@ -1,67 +1,345 @@
+" .vimrc
+" Author: Kenny Younger <kyounger@gmail.com>
+
+"
+" This was inspired by Steve Morrow and Steve Losh
+
+
+" Preamble ---------------------------------------------------------------- {{{
+
 filetype off
-filetype plugin indent on
 call pathogen#infect()
+filetype plugin indent on
 set nocompatible
 
-" Prevent arbitrary command execution vulnerability 
-" http://www.securityfocus.com/bid/14374/references
-set modelines=0
+" }}}
+" Basic options ----------------------------------------------------------- {{{
 
-set ruler    " Always show the current position 
-set hidden   " Change buffers without having to save
-
-" Set to autoread when file is changed outside of Vim
-set autoread
-
-" Ensure proper behavior for the backspace key
+set encoding=utf-8
+set modelines=0 " Prevent arbitrary command execution vulnerability - http://www.securityfocus.com/bid/14374/references
+set autoindent
+set showmode
+set showcmd
+set hidden
+set visualbell
+set ttyfast
+set ruler
 set backspace=indent,eol,start
+set nonumber
+set norelativenumber
+set laststatus=2
+set history=1000
+set undofile
+set undoreload=10000
+set list
+set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
+set shell=/bin/bash\ --login
+set lazyredraw
+set matchtime=5
+set showbreak=↪
+set splitbelow
+set splitright
+set fillchars=diff:⣿,vert:│
+" set autowrite
+set autoread
+set shiftround
+set title
+set linebreak
+""" come back to spelling later
+" set dictionary=/usr/share/dict/words
+" set spellfile=~/.vim/custom-dictionary.utf-8.add
 
-" Ensure diff is vertical by default
-set diffopt-=iwhite
+" Don't try to highlight lines longer than 800 characters.
+set synmaxcol=800
 
-" makes ~ act as an operator
+" Time out on key codes but not mappings.
+" Basically this makes terminal Vim work sanely.
+set notimeout
+set ttimeout
+set ttimeoutlen=10
+
+" Better Completion
+set complete=.,w,b,u,t
+set completeopt=longest,menuone,preview
+
 set tildeop
-
-" Be smart about case-sensitive searches
-set ignorecase
-set smartcase
-
-" By default, match every occurrence in a line, not just the first one
-set gdefault
-
-
-set incsearch              " Match while you type your search criteria
-set showmatch              " Call attention to the matching bracket
-set hlsearch               " Highlight all matches
-set matchtime=5            " duration to show matching brace (1/10 sec)
-set laststatus=2           " always show the status line
-set visualbell             " turn this puppy off
-" set colorcolumn=80         " for long lines (yes, 80 is archaeic)
-set wildmenu               " turn on wild menu
-set wildmode=list:longest,full
-set shortmess=filtIoOA     " shorten messages
+" set shortmess=filtIoOA     " shorten messages
 set report=0               " tell us about changes
 set nostartofline          " don't jump to the start of line when scrolling
-set virtualedit=block      " allow virtual edit in visual block ..
-set formatoptions+=qrn1    " support for numbered/bullet lists
-" set list listchars=tab:»»,trail:·
-
-" set encoding=ISO-8859-1
-set encoding=UTF-8 
-" Default file types
 set ffs=unix,dos,mac
+set autochdir
 
-let mapleader = ","
 
 
-set noswapfile                    " It's 2012, Vim.
+
+
+" Resize splits when the window is resized
+au VimResized * :wincmd =
+
+" clearly
+au InsertLeave * set nopaste
+
+" Cursorline {{{
+" Only show cursorline in the current window and in normal mode.
+
+augroup cline
+    au!
+    au WinLeave,InsertEnter * set nocursorline
+    au WinEnter,InsertLeave * set cursorline
+augroup END
+
+" }}}
+" Trailing whitespace {{{
+" Only shown when not in insert mode so I don't go insane.
+
+augroup trailing
+    au!
+    au InsertEnter * :set listchars-=trail:âŒ´
+augroup END
+
+" }}}
+" Wildmenu completion {{{
+
+set wildmenu
+set wildmode=list:longest
+
+set wildignore+=.hg,.git,.svn                    " Version control
+set wildignore+=*.aux,*.out,*.toc                " LaTeX intermediate files
+set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg   " binary images 
+set wildignore+=*.o,*.obj,*.exe,*.dll,*.manifest " compiled object files
+set wildignore+=*.spl                            " compiled spelling word lists
+set wildignore+=*.sw?                            " Vim swap files
+set wildignore+=*.DS_Store                       " OSX bullshit
+
+set wildignore+=*.luac                           " Lua byte code
+
+set wildignore+=migrations                       " Django migrations
+set wildignore+=*.pyc                            " Python byte code
+
+set wildignore+=*.orig                           " Merge resolution files
+
+" Clojure/Leiningen
+set wildignore+=classes
+set wildignore+=lib
+
+" }}}
+" Line Return {{{
+
+" Make sure Vim returns to the same line when you reopen a file.
+" Thanks, Amit
+augroup line_return
+    au!
+    au BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \     execute 'normal! g`"zvzz' |
+        \ endif
+augroup END
+
+" }}}
+" Tabs, spaces, wrapping {{{
+
+set tabstop=8
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+set wrap
+set textwidth=80
+set formatoptions=qrn1
+set colorcolumn=+1
+
+
+""" Steve Losh turns these off, so I will try
+" set autoindent 
+" set smartindent
+
+" Wrap toggling with <leader>w
+command! -nargs=* Wrap set wrap linebreak nolist
+nnoremap <leader>w :set nowrap! nolinebreak! nolist<cr>
+
+" }}}
+" Backups {{{
+
 set backup                        " enable backups
+set noswapfile                    " It's 2012, Vim.
+
+set undodir=~/.vim/tmp/undo//     " undo files
 set backupdir=~/.vim/tmp/backup// " backups
+" Make Vim able to edit crontab files again.
 set backupskip=/tmp/*,/private/tmp/*"
 
+set directory=~/.vim/tmp/swap//   " swap files
 
-" don't use Ex mode, use Q for formatting
-nnoremap Q gq
+" Make those folders automatically if they don't already exist.
+if !isdirectory(expand(&undodir))
+    call mkdir(expand(&undodir), "p")
+endif
+if !isdirectory(expand(&backupdir))
+    call mkdir(expand(&backupdir), "p")
+endif
+if !isdirectory(expand(&directory))
+    call mkdir(expand(&directory), "p")
+endif
+
+" }}}
+" Leader {{{
+
+let mapleader = ","
+let maplocalleader = "\\"
+
+" }}}
+" Color scheme {{{
+
+syntax on
+set background=dark
+let g:badwolf_html_link_underline = 0
+colorscheme badwolf
+
+" Reload the colorscheme whenever we write the file.
+augroup color_badwolf_dev
+    au!
+    au BufWritePost badwolf.vim color badwolf
+augroup END
+
+" Highlight VCS conflict markers
+match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
+
+" }}}
+
+" }}}
+" Convenience mappings ---------------------------------------------------- {{{
+
+noremap  <F1> :set invfullscreen<CR>
+inoremap <F1> <ESC>:set invfullscreen<CR>a
+
+map <F9> :MRU<CR>
+
+" " Toggle line numbers
+" nnoremap <leader>n :setlocal number!<cr>
+
+" Toggle between rnu, nu, and no numbering
+if version >= 703
+    function! ToggleLineNumbers()
+            if (!&nu && !&rnu)
+                set rnu
+            elseif &rnu
+                set nu
+            elseif &nu
+                set nonumber
+                set norelativenumber
+            endif
+    endfunction
+    :nnoremap <silent> <F2> :call ToggleLineNumbers()<cr>
+endif
+
+" Gonna try out not using cb=unnamed
+" System clipboard interaction.  Mostly from:
+" https://github.com/henrik/dotfiles/blob/master/vim/config/mappings.vim
+noremap <leader>y "*y
+noremap <leader>p :set paste<CR>"*p<CR>:set nopaste<CR>
+noremap <leader>P :set paste<CR>"*P<CR>:set nopaste<CR>
+vnoremap <leader>y "*ygv
+
+" left and right arrows navigate buffers
+nnoremap <right> :bn<cr>
+nnoremap <left> :bp<cr>
+
+" For some reason ctags refuses to ignore Python variables, so I'll just hack
+" the tags file with sed and strip them out myself.
+"
+" Sigh.
+nnoremap <leader><cr> :silent !/usr/local/bin/ctags -R . && sed -i .bak -E -e '/^[^	]+	[^	]+.py	.+v$/d' tags<cr>:redraw!<cr>
+
+" Highlight Group(s)
+nnoremap <F8> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+                        \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+                        \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+
+" Changing to capital W
+" Clean trailing whitespace
+nnoremap <leader>W mz:%s/\s\+$//<cr>:let @/=''<cr>`z
+
+" Insert the directory of the current buffer in command line mode
+cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
+
+" Emacs bindings in command line mode
+cnoremap <c-a> <home>
+cnoremap <c-e> <end>
+
+" Select entire buffer
+nnoremap vaa ggvGg_
+nnoremap Vaa ggVG
+
+" Diffoff
+nnoremap <leader>D :diffoff!<cr>
+
+" Formatting, TextMate-style
+nnoremap Q gqip
+vnoremap Q gq
+
+" Reformat line.
+" I never use l as a macro register anyway.
+nnoremap ql ^vg_gq
+
+" Keep the cursor in place while joining lines
+nnoremap J mzJ`z
+
+" Split line (sister to [J]oin lines)
+" The normal use of S is covered by cc, so don't worry about shadowing it.
+nnoremap S i<cr><esc>^mwgk:silent! s/\v +$//<cr>:noh<cr>`w
+
+" HTML tag closing
+inoremap <C-_> <Space><BS><Esc>:call InsertCloseTag()<cr>a
+
+" " TODO: Consider this
+" " Marks and Quotes
+" noremap ' `
+" noremap æ '
+" noremap ` <C-^>
+
+" Select (charwise) the contents of the current line, excluding indentation.
+" Great for pasting Python lines into REPLs.
+nnoremap vv ^vg_
+
+" Sudo to write
+cnoremap w!! w !sudo tee % >/dev/null
+
+" Toggle paste
+set pastetoggle=<F6>
+
+nnoremap <leader>i :set list!<cr>
+
+" Fix my screen
+nnoremap U :syntax sync fromstart<cr>:redraw!<cr>
+
+" Drag Lines {{{
+
+" <m-j> and <m-k> to drag lines in any mode
+noremap ∆ :m+<CR>
+noremap ˚ :m-2<CR>
+inoremap ∆ <Esc>:m+<CR>
+inoremap ˚ <Esc>:m-2<CR>
+vnoremap ∆ :m'>+<CR>gv
+vnoremap ˚ :m-2<CR>gv
+
+" }}}
+" Easy filetype switching {{{
+
+nnoremap _md :set ft=markdown<CR>
+nnoremap _hd :set ft=htmldjango<CR>
+nnoremap _jt :set ft=htmljinja<CR>
+nnoremap _js :set ft=javascript<CR>
+nnoremap _cw :set ft=confluencewiki<CR>
+nnoremap _pd :set ft=python.django<CR>
+nnoremap _d  :set ft=diff<CR>
+
+" }}}
+" Insert Mode Completion {{{
+
+inoremap <c-f> <c-x><c-f>
+inoremap <c-]> <c-x><c-]>
+
+" }}}
+" Kenny's Custom Mappings {{{
 
 " use ',,' to swap between two most recent buffers
 nnoremap <leader><leader> <c-^>
@@ -72,26 +350,6 @@ inoremap kk <ESC>
 
 " Visually select the text that was last edited/pasted
 noremap gV `[v`]
-
-" Bubbling feature below required Tim Pope's vim-unimpaired
-" Bubble single lines
-nnoremap <C-Up> [e
-nnoremap <C-Down> ]e
-
-" Bubble multiple lines
-vnoremap <C-Up> [egv
-vnoremap <C-Down> ]egv
-
-" Sane movement with wrapped lines
-nnoremap j gj
-nnoremap k gk
-" g0 \
-" g$ _> These work, but don't map them. Just remember them!
-
-" Sane movement with wrapped lines in insert mode
-inoremap <silent> <Up> <Esc>gka
-inoremap <silent> <Down> <Esc>gja
-
 
 " Reselect visual block after indent/outdent
 vnoremap < <gv
@@ -116,220 +374,655 @@ vnoremap @@ :normal @@
 nnoremap <tab> %
 vnoremap <tab> %
 
-" http://vimcasts.org/e/14
-" expand the directory of the current file 
-" cnoremap %% <C-R>=expand('%:h').'/'<cr>
-
-" Wrap toggling with <leader>w
-command! -nargs=* Wrap set wrap linebreak nolist
-nnoremap <leader>w :set nowrap! nolinebreak! nolist<cr>
-
 " Fast editing of the Vim configuration file
 nnoremap <F3> :e ~/.vimrc<cr>
+" }}}
 
-" When Vim configuration file is edited, reload it
-if has("win32") 
-    " Set font in windows
-    set gfn=Consolas:h11:cDEFAULT
+" }}}
+" Quick editing ----------------------------------------------------------- {{{
+nnoremap <leader>ev :vsplit $MYVIMRC<cr>
+nnoremap <leader>et :vsplit ~/.tmux.conf<cr>
 
-    " Fast editing of the Vim configuration file
-    map <F3> :e ~/_vimrc<cr>
+" }}}
+" Searching and movement -------------------------------------------------- {{{
 
-    " When Vim configuration file is edited, reload it
-	au! bufwritepost _vimrc so ~/_vimrc
-
-    if has("gui_running")
-        au! bufwritepost _gvimrc so ~/_gvimrc
-    endif
-else
-    " Fast editing of the Vim configuration file
-    map <F3> :e ~/.vimrc<cr>
-
-	au! bufwritepost .vimrc so ~/.vimrc
-
-    if has("gui_running")
-        au! bufwritepost .gvimrc so ~/.gvimrc
-    endif
-endif
-
-" autocmd FileType python set omnifunc=pythoncomplete#Complete
-
-" clearly
-au InsertLeave * set nopaste
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" Use the "system clipboard"
-set cb=unnamed
-
-" Let mouse ScrollWheel work in terminal
-set mouse=a
-map <ScrollWheelUp> <C-Y>
-map <ScrollWheelDown> <C-E>
-
-
-if v:version > 700
-    " set cursorline
-    " hi CursorLine term=inverse cterm=NONE ctermbg=234 guibg=234
-    au WinLeave * set nocursorline 
-    au WinEnter * set cursorline 
-endif
-
-" " tmux will only forward escape sequences to the terminal if surrounded by a DCS sequence
-" " http://sourceforge.net/mailarchive/forum.php?thread_name=AANLkTinkbdoZ8eNR1X2UobLTeww1jFrvfJxTMfKSq-L%2B%40mail.gmail.com&forum_name=tmux-users
-" if exists('$TMUX')
-"   let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
-"   let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
-" else
-"   let &t_SI = "\<Esc>]50;CursorShape=1\x7"
-"   let &t_EI = "\<Esc>]50;CursorShape=0\x7"
-" endif
-
-" Set an orange cursor in insert mode, and a red cursor otherwise.
-" Works at least for xterm and rxvt terminals.
-" Does not work for gnome terminal, konsole, xfce4-terminal.
-" if &term =~ "xterm\\|rxvt\\|xterm-256color"
-"    :silent !echo -ne "\033]12;red\007"
-"    let &t_SI = "\033]12;orange\007"
-"    let &t_EI = "\033]12;red\007"
-"    autocmd VimLeave * :!echo -ne "\033]12;red\007"
-" endif
-
-
-" Make search expressions "very magic"
+" Use sane regexes.
 nnoremap / /\v
 vnoremap / /\v
 
+set ignorecase
+set smartcase
+set incsearch
+set showmatch
+set hlsearch
+set gdefault
 
-" Makes it easy to turn off highlighted matches
-nnoremap <leader><space> :noh<cr>
+set scrolloff=3
+set sidescroll=1
+set sidescrolloff=10
 
+set virtualedit+=block
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => *Colors_and_Fonts*
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+noremap <silent> <leader><space> :noh<cr>:call clearmatches()<cr>
 
-" Force 256 colors
-set t_Co=256
+runtime macros/matchit.vim
+map <tab> %
 
-if has("gui_running")
-    set go=
-endif
+" Made D behave
+nnoremap D d$
 
-let g:solarized_termcolors=256
-colorscheme solarized
-set background=dark
+" Don't move on *
+nnoremap * *<c-o>
 
+" Use c-\ to do c-] but open it in a new split.
+nnoremap <c-\> <c-w>v<c-]>zvzz
 
-try 
-	lang en_US
-catch
-endtry
+" Keep search matches in the middle of the window.
+nnoremap n nzzzv
+nnoremap N Nzzzv
 
+" Same when jumping around
+nnoremap g; g;zz
+nnoremap g, g,zz
+nnoremap <c-o> <c-o>zz
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Moving_Around
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Make navigation between window splits easier
-map <C-j> <C-w>j<C-w>_
-map <C-k> <C-w>k<C-w>_
-map <C-h> <C-w>h<C-w>
-map <C-l> <C-w>l<C-w>
+" Easier to type, and I never use the default behavior.
+noremap H ^
+noremap L $
+vnoremap L g_
 
-" Relative line numbers are convenient for non-:ex movements
-if version >= 703
-    function! ToggleLineNumbers()
-            if &nu
-                set rnu
-            else
-                set nu
-            endif
-    endfunction
-    :nnoremap <silent> <F2> :call ToggleLineNumbers()<cr>
+" Heresy
+inoremap <c-a> <esc>I
+inoremap <c-e> <esc>A
 
-    set rnu
-endif
+" gi already moves to "last place you exited insert mode", so we'll map gI to
+" something similar: move to last change
+nnoremap gI `.
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Buffer_Management
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Use the arrows for something useful, like moving among buffers,
-" Disables up and down arrows while in normal mode - use j and k, duh
-" Disables arrows during insert mode as well.
-nnoremap <right> :bn<cr>
-nnoremap <left> :bp<cr>
+" TODO: look into what the latter four of these do
+" Fix linewise visual selection of various text objects
+nnoremap VV V
+" nnoremap Vit vitVkoj
+" nnoremap Vat vatV
+" nnoremap Vab vabV
+" nnoremap VaB vaBV
 
-" Easier buffer selection by number
-nnoremap <leader>b :ls<cr>:b<Space>
+" This is awesome!
+" Toggle "keep current line in the center of the screen" mode
+nnoremap <leader>C :let &scrolloff=999-&scrolloff<cr>
 
-" Follow the open buffer
-if version >= 703
-    set autochdir
-endif
+" Directional Keys {{{
 
-" Easy printing
-map <S-F12> :hardcopy<cr>
+" It's 2012.
+noremap j gj
+noremap k gk
+noremap gj j
+noremap gk k
 
+" Easy split navigation
+noremap <C-h> <C-w>h
+noremap <C-j> <C-w>j
+noremap <C-k> <C-w>k
+noremap <C-l> <C-w>l
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Files_and_Backups
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Rely on version control more than Vim backups
-" set nobackup
-" set nowb
-" set noswapfile
+" Easy vertical split
+noremap <leader>v <C-w>v
 
-" Persistent undo
-" try
-" 	if has("win32")
-" 		set undodir=C:\Windows\Temp
-" 	else
-" 		set undodir=~/.vim/undodir
-" 	endif
-" 	set undofile
-" catch
-" endtry
+" }}}
+" Highlight word {{{
 
-" allows a command of :w!! to force a save as root
-" NOTE: seems to be built in with just :w!
-cmap w!! %!sudo tee > /dev/null %
+nnoremap <silent> <leader>h1 :execute 'match InterestingWord1 /\<<c-r><c-w>\>/'<cr>
+nnoremap <silent> <leader>h2 :execute '2match InterestingWord2 /\<<c-r><c-w>\>/'<cr>
+nnoremap <silent> <leader>h3 :execute '3match InterestingWord3 /\<<c-r><c-w>\>/'<cr>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Tabs_and_Indent
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-set expandtab
-set autoindent
-set smartindent
+" }}}
+" Visual Mode */# from Scrooloose {{{
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Editing_Mappings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Strip all trailing whitespace in the current file
+function! s:VSetSearch()
+  let temp = @@
+  norm! gvy
+  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+  let @@ = temp
+endfunction
+
+vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
+vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
+
+" }}}
+" List navigation {{{
+"
+" TODO: What is this for ?
+" nnoremap <left>  :cprev<cr>zvzz
+" nnoremap <right> :cnext<cr>zvzz
+" nnoremap <up>    :lprev<cr>zvzz
+" nnoremap <down>  :lnext<cr>zvzz
+
+" }}}
+
+" }}}
+" Folding ----------------------------------------------------------------- {{{
+
+set foldlevelstart=0
+
+" Space to toggle folds.
+nnoremap <Space> za
+vnoremap <Space> za
+
+" "Refocus" folds
+nnoremap ,z zMzvzz
+
+" Make zO recursively open whatever top level fold we're in, no matter where the
+" cursor happens to be.
+nnoremap zO zCzO
+
+function! MyFoldText() " {{{
+    let line = getline(v:foldstart)
+
+    let nucolwidth = &fdc + &number * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 3
+    let foldedlinecount = v:foldend - v:foldstart
+
+    " expand tabs into spaces
+    let onetab = strpart('          ', 0, &tabstop)
+    let line = substitute(line, '\t', onetab, 'g')
+
+    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+    return line . '…' . repeat(" ",fillcharcount) . foldedlinecount . '…' . ' '
+endfunction " }}}
+set foldtext=MyFoldText()
+
+" }}} /Folding
+" Filetype-specific ------------------------------------------------------- {{{
+
+" C {{{
+
+augroup ft_c
+    au!
+    au FileType c setlocal foldmethod=marker foldmarker={,}
+augroup END
+
+" }}}
+" Clojure {{{
+
+" function! SlimvToggleRepl()
+"     if bufname('%') ==# 'SLIMV.REPL'
+"         let origin = b:pop_back_to
+"         q
+"         execute "" . origin . "wincmd w"
+"     else
+"         let origin = winnr()
+"         vertical botright split
+"         e SLIMV.REPL
+"         let b:pop_back_to = origin
+"     endif
+" endfunction
+
+let g:slimv_leader = '\'
+let g:slimv_keybindings = 2
+
+augroup ft_clojure
+    au!
+
+    au BufNewFile,BufRead riemann.config set filetype=clojure
+    au FileType clojure silent! call TurnOnClojureFolding()
+    au FileType clojure compiler clojure
+    au FileType clojure setlocal report=100000
+
+    au BufWinEnter            SLIMV.REPL setlocal nolist
+    au BufNewFile,BufReadPost SLIMV.REPL setlocal nowrap foldlevel=99
+    au BufNewFile,BufReadPost SLIMV.REPL nnoremap <buffer> A GA
+    au BufNewFile,BufReadPost SLIMV.REPL nnoremap <buffer> <localleader>R :emenu REPL.<Tab>
+
+    " Fix the eval mappings.
+    au FileType clojure nnoremap <buffer> <localleader>ef :<c-u>call SlimvEvalExp()<cr>
+    au FileType clojure nnoremap <buffer> <localleader>ee :<c-u>call SlimvEvalDefun()<cr>
+
+    " And the inspect mapping.
+    au FileType clojure nmap <buffer> \i \di
+
+    " And REPL-toggling mapping.
+    " au FileType clojure nnoremap <buffer> \rr :call SlimvToggleRepl()<cr>
+
+    " Indent top-level form.
+    au FileType clojure nmap <buffer> <localleader>= mz99[(v%='z
+augroup END
+
+" }}}
+" Clojurescript {{{
+
+augroup ft_clojurescript
+    au!
+
+    au BufNewFile,BufRead *.cljs set filetype=clojurescript
+    au FileType clojurescript call TurnOnClojureFolding()
+
+    " Indent top-level form.
+    au FileType clojurescript nmap <buffer> <localleader>= v((((((((((((=%
+augroup END
+
+" }}}
+" Confluence {{{
+
+augroup ft_c
+    au!
+
+    au BufRead,BufNewFile *.confluencewiki setlocal filetype=confluencewiki
+
+    " Wiki pages should be soft-wrapped.
+    au FileType confluencewiki setlocal wrap linebreak nolist
+augroup END
+
+" }}}
+" Cram {{{
+
+let cram_fold=1
+
+augroup ft_cram
+    au!
+
+    au BufNewFile,BufRead *.t set filetype=cram
+    au Syntax cram setlocal foldlevel=1
+    au FileType cram nnoremap <buffer> <localleader>ee :e<cr>
+augroup END
+
+" }}}
+" CSS and LessCSS {{{
+
+augroup ft_css
+    au!
+
+    au BufNewFile,BufRead *.less setlocal filetype=less
+
+    au Filetype less,css setlocal foldmethod=marker
+    au Filetype less,css setlocal foldmarker={,}
+    au Filetype less,css setlocal omnifunc=csscomplete#CompleteCSS
+    au Filetype less,css setlocal iskeyword+=-
+
+    " Use <leader>S to sort properties.  Turns this:
+    "
+    "     p {
+    "         width: 200px;
+    "         height: 100px;
+    "         background: red;
+    "
+    "         ...
+    "     }
+    "
+    " into this:
+
+    "     p {
+    "         background: red;
+    "         height: 100px;
+    "         width: 200px;
+    "
+    "         ...
+    "     }
+    au BufNewFile,BufRead *.less,*.css nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
+
+    " Make {<cr> insert a pair of brackets in such a way that the cursor is correctly
+    " positioned inside of them AND the following code doesn't get unfolded.
+    au BufNewFile,BufRead *.less,*.css inoremap <buffer> {<cr> {}<left><cr><space><space><space><space>.<cr><esc>kA<bs>
+augroup END
+
+" }}}
+" Django {{{
+
+augroup ft_django
+    au!
+
+    au BufNewFile,BufRead urls.py           setlocal nowrap
+    au BufNewFile,BufRead urls.py           normal! zR
+    au BufNewFile,BufRead dashboard.py      normal! zR
+    au BufNewFile,BufRead local_settings.py normal! zR
+
+    au BufNewFile,BufRead admin.py     setlocal filetype=python.django
+    au BufNewFile,BufRead urls.py      setlocal filetype=python.django
+    au BufNewFile,BufRead models.py    setlocal filetype=python.django
+    au BufNewFile,BufRead views.py     setlocal filetype=python.django
+    au BufNewFile,BufRead settings.py  setlocal filetype=python.django
+    au BufNewFile,BufRead settings.py  setlocal foldmethod=marker
+    au BufNewFile,BufRead forms.py     setlocal filetype=python.django
+    au BufNewFile,BufRead common_settings.py  setlocal filetype=python.django
+    au BufNewFile,BufRead common_settings.py  setlocal foldmethod=marker
+augroup END
+
+" }}}
+" Firefox {{{
+
+augroup ft_firefox
+    au!
+    au BufRead,BufNewFile ~/Library/Caches/*.html setlocal buftype=nofile
+augroup END
+
+" }}}
+" Fish {{{
+
+augroup ft_fish
+    au!
+
+    au BufNewFile,BufRead *.fish setlocal filetype=fish
+
+    au FileType fish setlocal foldmethod=marker foldmarker={{{,}}}
+augroup END
+
+" }}}
+" Haskell {{{
+
+augroup ft_haskell
+    au!
+    au BufEnter *.hs compiler ghc
+augroup END
+
+" }}}
+" HTML and HTMLDjango {{{
+
+let g:html_indent_tags = ['p', 'li']
+
+augroup ft_html
+    au!
+
+    au BufNewFile,BufRead *.html setlocal filetype=htmldjango
+    au FileType html,jinja,htmldjango setlocal foldmethod=manual
+
+    " Use <localleader>f to fold the current tag.
+    au FileType html,jinja,htmldjango nnoremap <buffer> <localleader>f Vatzf
+
+    " Use <localleader>t to fold the current templatetag.
+    au FileType html,jinja,htmldjango nmap <buffer> <localleader>t viikojozf
+
+    " Indent tag
+    au FileType html,jinja,htmldjango nnoremap <buffer> <localleader>= Vat=
+
+    " Django tags
+    au FileType jinja,htmldjango inoremap <buffer> <c-t> {%<space><space>%}<left><left><left>
+
+    " Django variables
+    au FileType jinja,htmldjango inoremap <buffer> <c-f> {{<space><space>}}<left><left><left>
+augroup END
+
+" }}}
+" Java {{{
+
+augroup ft_java
+    au!
+
+    au FileType java setlocal foldmethod=marker
+    au FileType java setlocal foldmarker={,}
+augroup END
+
+" }}}
+" Javascript {{{
+
+augroup ft_javascript
+    au!
+
+    au FileType javascript setlocal foldmethod=marker
+    au FileType javascript setlocal foldmarker={,}
+
+    " Make {<cr> insert a pair of brackets in such a way that the cursor is correctly
+    " positioned inside of them AND the following code doesn't get unfolded.
+    au Filetype javascript inoremap <buffer> {<cr> {}<left><cr><space><space><space><space>.<cr><esc>kA<bs>
+augroup END
+
+" }}}
+" Lisp {{{
+
+augroup ft_lisp
+    au!
+    au FileType lisp call TurnOnLispFolding()
+    " au FileType lisp nnoremap <buffer> <localleader>ee mz99[(va("ry:call Send_to_Tmux(@r)<cr>
+    au FileType lisp nnoremap <buffer> <localleader>ee mz99[(:call SlimvEvalExp()<cr>`z
+
+    au FileType lisp nnoremap <buffer> <localleader>tt mz99[(vab"ry:call Send_to_Tmux(@r)<cr>`z
+    au FileType lisp nnoremap <buffer> <localleader>tb mzggVG"ry:call Send_to_Tmux(@r)<cr>`z
+augroup END
+
+" }}}
+" Mail {{{
+
+augroup ft_mail
+    au!
+
+    au Filetype mail setlocal spell
+augroup END
+
+" }}}
+" Markdown {{{
+
+augroup ft_markdown
+    au!
+
+    au BufNewFile,BufRead *.m*down setlocal filetype=markdown
+
+    " Use <localleader>1/2/3 to add headings.
+    au Filetype markdown nnoremap <buffer> <localleader>1 yypVr=:redraw<cr>
+    au Filetype markdown nnoremap <buffer> <localleader>2 yypVr-:redraw<cr>
+    au Filetype markdown nnoremap <buffer> <localleader>3 mzI###<space>`zllll <ESC>
+augroup END
+
+" }}}
+" Mercurial {{{
+
+augroup ft_mercurial
+    au!
+
+    au BufNewFile,BufRead *hg-editor-*.txt setlocal filetype=hgcommit
+augroup END
+
+" }}}
+" Mutt {{{
+
+augroup ft_muttrc
+    au!
+
+    au BufRead,BufNewFile *.muttrc set ft=muttrc
+
+    au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
+augroup END
+
+" }}}
+" Nginx {{{
+
+augroup ft_nginx
+    au!
+
+    au BufRead,BufNewFile /etc/nginx/conf/*                      set ft=nginx
+    au BufRead,BufNewFile /etc/nginx/sites-available/*           set ft=nginx
+    au BufRead,BufNewFile /usr/local/etc/nginx/sites-available/* set ft=nginx
+    au BufRead,BufNewFile vhost.nginx                            set ft=nginx
+
+    au FileType nginx setlocal foldmethod=marker foldmarker={,}
+augroup END
+
+" }}}
+" OrgMode {{{
+
+augroup ft_org
+    au!
+
+    au Filetype org nmap <buffer> Q vahjgq
+    au Filetype org setlocal nolist
+augroup END
+
+" }}}
+" Pentadactyl {{{
+
+augroup ft_pentadactyl
+    au!
+    au BufNewFile,BufRead .pentadactylrc set filetype=pentadactyl
+    au BufNewFile,BufRead ~/Library/Caches/TemporaryItems/pentadactyl-*.tmp set nolist wrap linebreak columns=100 colorcolumn=0
+augroup END
+
+" }}}
+" Puppet {{{
+
+augroup ft_puppet
+    au!
+
+    au Filetype puppet setlocal foldmethod=marker
+    au Filetype puppet setlocal foldmarker={,}
+augroup END
+
+" }}}
+" Python {{{
+
+augroup ft_python
+    au!
+
+    au FileType python setlocal define=^\s*\\(def\\\\|class\\)
+    au FileType man nnoremap <buffer> <cr> :q<cr>
+
+    " Jesus tapdancing Christ, built-in Python syntax, you couldn't let me
+    " override this in a normal way, could you?
+    au FileType python if exists("python_space_error_highlight") | unlet python_space_error_highlight | endif
+
+    " Jesus, Python.  Five characters of punctuation for a damn string?
+    au FileType python inoremap <buffer> <c-g> _(u'')<left><left>
+
+    au FileType python inoremap <buffer> <c-b> """"""<left><left><left>
+augroup END
+
+" }}}
+" QuickFix {{{
+
+augroup ft_quickfix
+    au!
+    au Filetype qf setlocal colorcolumn=0 nolist nocursorline nowrap tw=0
+augroup END
+
+" }}}
+" ReStructuredText {{{
+
+augroup ft_rest
+    au!
+
+    au Filetype rst nnoremap <buffer> <localleader>1 yypVr=:redraw<cr>
+    au Filetype rst nnoremap <buffer> <localleader>2 yypVr-:redraw<cr>
+    au Filetype rst nnoremap <buffer> <localleader>3 yypVr~:redraw<cr>
+    au Filetype rst nnoremap <buffer> <localleader>4 yypVr`:redraw<cr>
+augroup END
+
+" }}}
+" Riemann Config Files {{{
+
+augroup ft_riemann
+    au!
+
+    au BufNewFile,BufRead riemann.config set filetype=clojure
+    au BufNewFile,BufRead riemann.config nnoremap <buffer> <localleader>= mzgg=G`z
+augroup END
+
+" }}}
+" Ruby {{{
+
+augroup ft_ruby
+    au!
+    au Filetype ruby setlocal foldmethod=syntax
+augroup END
+
+" }}}
+" stevelosh.com Blog Entries {{{
+
+augroup ft_steveloshcom
+    au!
+    au BufRead,BufNewFile */stevelosh/content/blog/20*/*/*.html set ft=markdown spell
+    au BufRead,BufNewFile */stevelosh/content/projects/*.html set ft=markdown spell
+augroup END
+
+" }}}
+" Vagrant {{{
+
+augroup ft_vagrant
+    au!
+    au BufRead,BufNewFile Vagrantfile set ft=ruby
+augroup END
+
+" }}}
+" Vim {{{
+
+augroup ft_vim
+    au!
+
+    au FileType vim setlocal foldmethod=marker
+    au FileType help setlocal textwidth=78
+    au BufWinEnter *.txt if &ft == 'help' | wincmd L | endif
+augroup END
+
+" }}}
+
+" }}}
+" Plugin settings --------------------------------------------------------- {{{
+
+" Powerline {{{
+
+let g:Powerline_symbols = 'fancy'
+let g:Powerline_cache_enabled = 1
+" let g:Powerline_colorscheme = 'badwolf'
+
+" }}}
+" tComment {{{
+nmap <leader>c gcc
+vmap <leader>c gcc<ESC>
+" }}}
+
+" }}}
+" Mini-Plugins ------------------------------------------------------------ {{{
+" Indent Guides {{{
+
+let g:indentguides_state = 0
+function! IndentGuides() " {{{
+    if g:indentguides_state
+        let g:indentguides_state = 0
+        2match None
+    else
+        let g:indentguides_state = 1
+        execute '2match IndentGuides /\%(\_^\s*\)\@<=\%(\%'.(0*&sw+1).'v\|\%'.(1*&sw+1).'v\|\%'.(2*&sw+1).'v\|\%'.(3*&sw+1).'v\|\%'.(4*&sw+1).'v\|\%'.(5*&sw+1).'v\|\%'.(6*&sw+1).'v\|\%'.(7*&sw+1).'v\)\s/'
+    endif
+endfunction " }}}
+hi def IndentGuides guibg=#303030
+nnoremap <leader>I :call IndentGuides()<cr>
+
+" }}}
+" Block Colors {{{
+
+let g:blockcolor_state = 0
+function! BlockColor() " {{{
+    if g:blockcolor_state
+        let g:blockcolor_state = 0
+        call matchdelete(77881)
+        call matchdelete(77882)
+        call matchdelete(77883)
+        call matchdelete(77884)
+        call matchdelete(77885)
+    else
+        let g:blockcolor_state = 1
+        call matchadd("BlockColor1", '^ \{4}.*', 1, 77881)
+        call matchadd("BlockColor2", '^ \{8}.*', 2, 77882)
+        call matchadd("BlockColor3", '^ \{12}.*', 3, 77883)
+        call matchadd("BlockColor4", '^ \{16}.*', 4, 77884)
+        call matchadd("BlockColor5", '^ \{20}.*', 5, 77885)
+    endif
+endfunction " }}}
+" Default highlights {{{
+hi def BlockColor1 guibg=#222222
+hi def BlockColor2 guibg=#2a2a2a
+hi def BlockColor3 guibg=#353535
+hi def BlockColor4 guibg=#3d3d3d
+hi def BlockColor5 guibg=#444444
+" }}}
+nnoremap <leader>B :call BlockColor()<cr>
+
+" }}}
+" TrimTrailingWhitespace {{{
 command! TrimTrailingWhitespace call TrimTrailingWhitespace()
 function! TrimTrailingWhitespace()
     if !&binary && &filetype != 'diff'
         %s/\s\+$//e
     endif
 endfunction
-
-" tComment
-nmap <leader>c gcc
-vmap <leader>c gcc<ESC>
-
-" Sparkup Settings
-let g:sparkupExecuteMapping='<C-q>'
-let g:sparkupNextMapping='<C-w>'
-
-" CSS Tidy
-" autocmd filetype css setlocal equalprg=csstidy\ -\ --silent=true\ --preserve_css=true
-
-" pretty format JSON
-" to get json_xs, use `sudo cpan JSON::XS`
-map <leader>jt  <Esc>:%!json_xs -f json -t json-pretty
-
+" }}}
+" ReverseWord {{{
 command! ReverseWord call ReverseWord()
 function! ReverseWord()
 perl << EOF
@@ -339,212 +1032,77 @@ perl << EOF
     VIM::DoCommand("norm lbcw$reversed");
 EOF
 endfun
+" }}}
 
-" show number of occurences of a word under the cursor
-" map <f5> :execute ":%s@\\<" . expand("<cword>") . "\\>\@&@gn"<CR>
+" }}}
+" Environments (GUI/Console) ---------------------------------------------- {{{
 
-" Hex mode on and off
-map <Leader>hon :%!xxd<CR>
-map <Leader>hof :%!xxd -r<CR>
+if has('gui_running')
+    " GUI Vim
 
-au FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"
+    " TODO: setup patched font
+    " set guifont=Menlo\ Regular\ for\ Powerline:h12
 
-function! EscapeText(text)
-    let l:escaped_text = a:text
+    " Remove all the UI cruft
+    set go-=T
+    set go-=l
+    set go-=L
+    set go-=r
+    set go-=R
 
-    " Map characters to named C backslash escapes. Normally, single-quoted
-    " strings don't require double-backslashing, but these are necessary
-    " to make the substitute() call below work properly.
-    "
-    let l:charmap = {
-    \   '"'     : '\\"',
-    \   "'"     : '\\''',
-    \   "\n"    : '\\n',
-    \   "\r"    : '\\r',
-    \   "\b"    : '\\b',
-    \   "\t"    : '\\t',
-    \   "\x07"  : '\\a',
-    \   "\x0B"  : '\\v',
-    \   "\f"    : '\\f',
-    \   "\/"    : '\\/',
-    \   }
+    " TODO: get spellcheck working
+    " highlight SpellBad term=underline gui=undercurl guisp=Orange
 
-    " Escape any existing backslashes in the text first, before
-    " generating new ones. (Vim dictionaries iterate in arbitrary order,
-    " so this step can't be combined with the items() loop below.)
-    "
-    let l:escaped_text = substitute(l:escaped_text, "\\", '\\\', 'g')
+    " Different cursors for different modes.
+    set guicursor=n-c:block-Cursor-blinkon0
+    set guicursor+=v:block-vCursor-blinkon0
+    set guicursor+=i-ci:ver20-iCursor
 
-    " Replace actual returns, newlines, tabs, etc., with their escaped
-    " representations.
-    "
-    for [original, escaped] in items(charmap)
-        let l:escaped_text = substitute(l:escaped_text, original, escaped, 'g')
-    endfor
+    if has("gui_macvim")
+        " Full screen means FULL screen
+        set fuoptions=maxvert,maxhorz
 
-    " Replace any other character that isn't a letter, number,
-    " punctuation, or space with a 3-digit octal escape sequence. (Octal
-    " is used instead of hex, since octal escapes terminate after 3
-    " digits. C allows hex escapes of any length, so it's possible for
-    " them to run up against subsequent characters that might be valid
-    " hex digits.)
-    "
-    let l:escaped_text = substitute(l:escaped_text,
-    \   '\([^[:alnum:][:punct:] ]\)',
-    \   '\="\\o" . printf("%03o",char2nr(submatch(1)))',
-    \   'g')
+        " Use the normal HIG movements, except for M-Up/Down
+        let macvim_skip_cmd_opt_movement = 1
+        no   <D-Left>       <Home>
+        no!  <D-Left>       <Home>
+        no   <M-Left>       <C-Left>
+        no!  <M-Left>       <C-Left>
 
-    return l:escaped_text
-endfunction
+        no   <D-Right>      <End>
+        no!  <D-Right>      <End>
+        no   <M-Right>      <C-Right>
+        no!  <M-Right>      <C-Right>
 
-function! PasteEscapedRegister(where)
-    " Remember current register name, contents, and type,
-    " so they can be restored once we're done.
-    "
-    let l:save_reg_name     = v:register
-    let l:save_reg_contents = getreg(l:save_reg_name, 1)
-    let l:save_reg_type     = getregtype(l:save_reg_name)
+        no   <D-Up>         <C-Home>
+        ino  <D-Up>         <C-Home>
+        imap <M-Up>         <C-o>{
 
-    echo "register: [" . l:save_reg_name . "] type: [" . l:save_reg_type . "]"
+        no   <D-Down>       <C-End>
+        ino  <D-Down>       <C-End>
+        imap <M-Down>       <C-o>}
 
-    " Replace the contents of the register with the escaped text, and set the
-    " type to characterwise (so pasting into an existing double-quoted string,
-    " for example, will work as expected).
-    " 
-    call setreg(l:save_reg_name, EscapeText(getreg(l:save_reg_name)), "c")
+        imap <M-BS>         <C-w>
+        inoremap <D-BS>     <esc>my0c`y
+    else
+        " Non-MacVim GUI, like Gvim
+    end
+else
+    " Console Vim
+    " For me, this means iTerm2, possibly through tmux
 
-    " Build the appropriate normal-mode paste command.
-    " 
-    let l:cmd = 'normal "' . l:save_reg_name . (a:where == "before" ? "P" : "p")
-
-    " Insert the escaped register contents.
-    "
-    exec l:cmd
-
-    " Restore the register to its original value and type.
-    " 
-    call setreg(l:save_reg_name, l:save_reg_contents, l:save_reg_type)
-endfunction
-
-" Define keymaps to paste escaped text before or after the cursor.
-nmap <Leader>P :call PasteEscapedRegister("before")<cr>
-nmap <Leader>p :call PasteEscapedRegister("after")<cr>
-
-nmap ,t :ToggleWord<CR>
-map <F9> :MRU<CR>
-
-" let $Tlist_Ctags_Cmd='/opt/local/bin/ctags'
-
-"""""""""""""""" START Find With Visual Selection """""""""""""""""
-
-" Search for selected text, forwards or backwards.
-vnoremap <silent> * :<C-U>
-  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-  \gvy/<C-R><C-R>=substitute(
-  \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-  \gV:call setreg('"', old_reg, old_regtype)<CR>
-vnoremap <silent> # :<C-U>
-  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-  \gvy?<C-R><C-R>=substitute(
-  \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-  \gV:call setreg('"', old_reg, old_regtype)<CR>
-
-"""""""""""""""" END Find With Visual Selection """""""""""""""""
-
-
-"""""""""""""""" START Replace With Visual Selection """""""""""""""""
-
-" Escape special characters in a string for exact matching.
-" This is useful to copying strings from the file to the search tool
-" Based on this - http://peterodding.com/code/vim/profile/autoload/xolox/escape.vim
-function! EscapeString (string)
-  let string=a:string
-  " Escape regex characters
-  let string = escape(string, '^$.*\/~[]')
-  " Escape the line endings
-  let string = substitute(string, '\n', '\\n', 'g')
-  return string
-endfunction
-
-" Get the current visual block for search and replaces
-" This function passed the visual block through a string escape function
-" Based on this - http://stackoverflow.com/questions/676600/vim-replace-selected-text/677918#677918
-function! GetVisual() range
-  " Save the current register and clipboard
-  let reg_save = getreg('"')
-  let regtype_save = getregtype('"')
-  let cb_save = &clipboard
-  set clipboard&
-
-  " Put the current visual selection in the " register
-  normal! ""gvy
-  let selection = getreg('"')
-
-  " Put the saved registers and clipboards back
-  call setreg('"', reg_save, regtype_save)
-  let &clipboard = cb_save
-
-  "Escape any special characters in the selection
-  let escaped_selection = EscapeString(selection)
-
-  return escaped_selection
-endfunction
-
-"hacky
-function! GetUnescapedVisual() range
-  " Save the current register and clipboard
-  let reg_save = getreg('"')
-  let regtype_save = getregtype('"')
-  let cb_save = &clipboard
-  set clipboard&
-
-  " Put the current visual selection in the " register
-  normal! ""gvy
-  let selection = getreg('"')
-
-  " Put the saved registers and clipboards back
-  call setreg('"', reg_save, regtype_save)
-  let &clipboard = cb_save
-
-  " "Escape any special characters in the selection
-  " let escaped_selection = EscapeString(selection)
-
-  " return escaped_selection
-  return selection
-endfunction
-
-" Start the find and replace command across the entire file
-" vmap <leader>r <Esc>:%s/<c-r>=GetVisual()<cr>/
-vnoremap <silent> R <Esc>:%s/<c-r>=GetVisual()<cr>/
-
-"""""""""""""""" END Replace With Visual Selection """""""""""""""""
-
-" Search google (In Chrome) with alt+g
-function! Terms()
-  call inputsave()
-  let searchterm = input('Search: ')
-  call inputrestore()
-  return searchterm
-endfunction
-map © <ESC>:! /usr/bin/open -a "/Applications/Google Chrome.app" 'https://google.com/search?q=<C-R>=Terms()<CR>'<CR><CR>
-map ƒ <ESC>:! /usr/bin/open -a "/Applications/Google Chrome.app" 'https://google.com/search?q=<C-R>=GetUnescapedVisual()<CR>'<CR><CR>
-
-
-
-" This pretty much disables tabs. Which is fine with me!
-autocmd BufWinEnter,BufNewFile * silent tabo
-
-" Look into this for split swapping:
-" http://stackoverflow.com/questions/2586984/how-can-i-swap-positions-of-two-open-files-in-splits-in-vim
-"
-"
-
-if exists("g:confirm_quit") || &cp
-    finish
+    " Mouse support
+    set mouse=a
 endif
-let g:confirm_quit = 1
 
+
+" Win32 GVim
 if has("gui_running") && has("win32")
+    if exists("g:confirm_quit") || &cp
+        finish
+    endif
+    let g:confirm_quit = 1
+
     function! ConfirmQuit(writeFile)
         if (a:writeFile)
             if (expand("#")=="")
@@ -565,44 +1123,12 @@ if has("gui_running") && has("win32")
     cnoremap <silent> x<cr> call ConfirmQuit(1)<cr>
 endif
 
-
-"------ shows how the next set of mappings works ------"
-" gcw        - capitalize word (from cursor position to end of word)
-" gcW        - capitalize WORD (from cursor position to end of WORD)
-" gciw       - capitalize inner word (from start to end)
-" gciW       - capitalize inner WORD (from start to end)
-" gcis       - capitalize inner sentence
-" gc$        - capitalize until end of line (from cursor postition)
-" gcgc       - capitalize whole line (from start to end)
-" gcc        - capitalize whole line
-" {Visual}gc - capitalize highlighted text
-
-if (&tildeop)
-  nmap gcw guw~l
-  nmap gcW guW~l
-  nmap gciw guiw~l
-  nmap gciW guiW~l
-  nmap gcis guis~l
-  nmap gc$ gu$~l
-  nmap gcgc guu~l
-  nmap gcc guu~l
-  vmap gc gu~l
-else
-  nmap gcw guw~h
-  nmap gcW guW~h
-  nmap gciw guiw~h
-  nmap gciW guiW~h
-  nmap gcis guis~h
-  nmap gc$ gu$~h
-  nmap gcgc guu~h
-  nmap gcc guu~h
-  vmap gc gu~h
-endif
-
-"powerline stuff:
-let g:Powerline_symbols = 'fancy'
-let g:Powerline_cache_enabled = 1
+" }}}
 
 
+" TODO: Look into this for split swapping:
+" http://stackoverflow.com/questions/2586984/how-can-i-swap-positions-of-two-open-files-in-splits-in-vim
 
-syntax on    " Enable syntax highlighting
+" An old setting I really liked that I don't want to remove yet
+" autocmd BufWinEnter,BufNewFile * silent tabo
+
