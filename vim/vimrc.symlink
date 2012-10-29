@@ -966,18 +966,10 @@ let g:Powerline_cache_enabled = 1
 nmap <leader>c gcc
 vmap <leader>c gcc<ESC>
 " }}}
-" Commentary {{{
+" Linediff {{{
 
-nmap <leader>c <Plug>CommentaryLine
-xmap <leader>c <Plug>Commentary
-
-augroup plugin_commentary
-    au!
-    au FileType htmldjango setlocal commentstring={#\ %s\ #}
-    au FileType clojurescript setlocal commentstring=;\ %s
-    au FileType puppet setlocal commentstring=#\ %s
-    au FileType fish setlocal commentstring=#\ %s
-augroup END
+vnoremap <leader>l :Linediff<cr>
+nnoremap <leader>L :LinediffReset<cr>
 
 " }}}
 
