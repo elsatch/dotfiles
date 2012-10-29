@@ -9,6 +9,3 @@ if has("gui_macvim")
     catch
     endtry
 endif
-
-set anti
-" set guioptions=egmrt
