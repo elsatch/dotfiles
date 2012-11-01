@@ -305,7 +305,7 @@ nnoremap vv ^vg_
 cnoremap w!! w !sudo tee % >/dev/null
 
 " Toggle paste
-set pastetoggle=<F6>
+nnoremap <F6> :set paste!<cr>
 
 nnoremap <leader>i :set list!<cr>
 
@@ -508,9 +508,6 @@ set foldlevelstart=0
 " Space to toggle folds.
 nnoremap <Space> za
 vnoremap <Space> za
-
-" "Refocus" folds
-nnoremap ,z zMzvzz
 
 " Make zO recursively open whatever top level fold we're in, no matter where the
 " cursor happens to be.
@@ -1001,7 +998,7 @@ nnoremap <leader>L :LinediffReset<cr>
 " }}}
 " Powerline {{{
 
-let g:Powerline_symbols = 'fancy'
+" let g:Powerline_symbols = 'fancy'
 let g:Powerline_cache_enabled = 1
 " let g:Powerline_colorscheme = 'badwolf'
 
